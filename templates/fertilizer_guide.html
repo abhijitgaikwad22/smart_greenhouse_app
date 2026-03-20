@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fertilizer Guide - Smart Greenhouse</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Syne:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ===== FERTILIZER PAGE SPECIFIC STYLES ===== */
+        .fertilizer-hero {
+            text-align: center;
+            margin-bottom: var(--space-12);
+            position: relative;
+        }
+
+        .fertilizer-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+            background: var(--glass-green);
+            border: 1px solid var(--border-soft);
+            padding: var(--space-2) var(--space-5);
+            border-radius: var(--radius-full);
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--green-400);
+            margin-bottom: var(--space-4);
+        }
+
+        .fertilizer-title {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 800;
+            background: var(--gradient-neon);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: var(--space-3);
+        }
+
+        .fertilizer-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Selection Panel */
+        .selection-panel {
+            background: var(--gradient-card);
+            border-radius: var(--radius-2xl);
+            padding: var(--space-8);
+            border: 1px solid var(--border-subtle);
+            margin-bottom: var(--space-10);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .selection-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: var(--space-6);
+            align-items: end;
+        }
+
+        .crop-select-wrapper {
+            position: relative;
+        }
+
+        .crop-select-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: var(--space-2);
+            display: block;
+        }
+
+        .crop-select {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            background: var(--bg-raised);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-xl);
+            font-family: var(--font-body);
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%234a7550'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1.5rem center;
+            background-size: 16px;
+            transition: var(--t-base);
+        }
+
+        .crop-select:hover {
+            border-color: var(--border-soft);
+            background: var(--bg-card);
+        }
+
+        .crop-select:focus {
+            outline: none;
+            border-color: var(--green-500);
+            box-shadow: 0 0 0 3px rgba(0, 212, 79, 0.15);
+        }
+
+        .find-btn {
+            background: var(--gradient-green);
+            border: none;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            padding: 1rem 2rem;
+            border-radius: var(--radius-xl);
+            cursor: pointer;
+            transition: var(--t-spring);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-2);
+            height: fit-content;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .find-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--glow-green), var(--shadow-lg);
+        }
+
+        /* Results Section */
+        .results-section {
+            margin-top: var(--space-8);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--space-6);
+            flex-wrap: wrap;
+            gap: var(--space-4);
+        }
+
+        .section-header h2 {
+            color: var(--text-white);
+            font-size: 1.8rem;
+        }
+
+        .crop-name-badge {
+            background: var(--glass-green);
+            border: 1px solid var(--border-soft);
+            padding: var(--space-2) var(--space-5);
+            border-radius: var(--radius-full);
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--green-400);
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        /* Fertilizer Cards */
+        .fertilizer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: var(--space-5);
+            margin-bottom: var(--space-8);
+        }
+
+        .fertilizer-card {
+            background: var(--gradient-card);
+            border-radius: var(--radius-xl);
+            padding: var(--space-6);
+            border: 1px solid var(--border-subtle);
+            transition: var(--t-spring);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .fertilizer-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient-green);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .fertilizer-card:hover {
+            transform: translateY(-6px);
+            border-color: var(--border-soft);
+            box-shadow: var(--glow-sm), var(--shadow-xl);
+        }
+
+        .fertilizer-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+            margin-bottom: var(--space-4);
+        }
+
+        .rank-badge {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--gradient-green);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        .rank-badge.top1 {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .rank-badge.top2 {
+            background: linear-gradient(135deg, #C0C0C0, #A0A0A0);
+            box-shadow: 0 0 20px rgba(192, 192, 192, 0.5);
+        }
+
+        .rank-badge.top3 {
+            background: linear-gradient(135deg, #CD7F32, #B87333);
+            box-shadow: 0 0 20px rgba(205, 127, 50, 0.5);
+        }
+
+        .fertilizer-name {
+            flex: 1;
+        }
+
+        .fertilizer-name h3 {
+            font-size: 1.3rem;
+            color: var(--text-white);
+            margin-bottom: 0.2rem;
+        }
+
+        .fertilizer-type {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .fertilizer-desc {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: var(--space-4);
+            line-height: 1.7;
+        }
+
+        .specs-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-3);
+            margin-bottom: var(--space-4);
+        }
+
+        .spec-item {
+            background: var(--bg-raised);
+            border-radius: var(--radius-lg);
+            padding: var(--space-3);
+            text-align: center;
+        }
+
+        .spec-label {
+            color: var(--text-muted);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.2rem;
+        }
+
+        .spec-value {
+            color: var(--green-400);
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .price-section {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--space-4);
+            padding-top: var(--space-3);
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        .price {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--text-white);
+        }
+
+        .price small {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .rating {
+            display: flex;
+            align-items: center;
+            gap: 0.2rem;
+            color: var(--amber-400);
+        }
+
+        .rating span {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            margin-left: 0.3rem;
+        }
+
+        .buy-btn {
+            background: transparent;
+            border: 1px solid var(--border-bright);
+            color: var(--green-400);
+            padding: 0.8rem;
+            border-radius: var(--radius-lg);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--t-base);
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-2);
+            text-decoration: none;
+        }
+
+        .buy-btn:hover {
+            background: var(--glass-green-hover);
+            border-color: var(--green-500);
+            color: var(--green-300);
+            transform: translateY(-2px);
+        }
+
+        /* Why These Section */
+        .why-these {
+            background: var(--glass-green);
+            border-radius: var(--radius-xl);
+            padding: var(--space-6);
+            margin: var(--space-8) 0;
+            border: 1px solid var(--border-soft);
+        }
+
+        .why-these h3 {
+            color: var(--text-white);
+            margin-bottom: var(--space-4);
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .why-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-4);
+        }
+
+        .why-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .why-item i {
+            color: var(--green-400);
+            font-size: 1.2rem;
+        }
+
+        /* Loading State */
+        .loading-state {
+            text-align: center;
+            padding: var(--space-12);
+            background: var(--bg-raised);
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--border-subtle);
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid var(--border-subtle);
+            border-top-color: var(--green-500);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto var(--space-4);
+        }
+
+        /* No Results */
+        .no-results {
+            text-align: center;
+            padding: var(--space-12);
+            background: var(--bg-raised);
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--border-subtle);
+        }
+
+        .no-results i {
+            font-size: 3rem;
+            color: var(--text-muted);
+            margin-bottom: var(--space-4);
+            display: block;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .selection-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .why-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .fertilizer-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <span class="logo-icon">🌿</span>
+            <span>GreenHouse AI</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="{{ url_for('auth.index') }}">Home</a></li>
+            
+            <li><a href="{{ url_for('detection.detect') }}">Detection</a></li>
+            <li><a href="{{ url_for('dashboard.dashboard') }}">Dashboard</a></li>
+            <li><a href="{{ url_for('crop_comparison') }}">Comparison</a></li>
+            <li><a href="{{ url_for('crop_recommendation') }}">AI Recommend</a></li>
+            <li><a href="{{ url_for('fertilizer_guide') }}" class="active">Fertilizer Guide</a></li>
+            <li><a href="{{ url_for('auth.logout') }}" class="btn-login">Logout</a></li>
+
+        </ul>
+    </nav>
+
+    <div class="section">
+        <!-- Hero Section -->
+        <div class="fertilizer-hero">
+            <div class="fertilizer-badge">
+                <span>🌱</span>
+                <span>NUTRIENT OPTIMIZER</span>
+                <span>🌱</span>
+            </div>
+            <h1 class="fertilizer-title">Fertilizer Guide</h1>
+            <p class="fertilizer-subtitle">
+                तुमच्या पिकासाठी सर्वोत्तम खत निवडा | Choose the best fertilizer for your crop
+            </p>
+        </div>
+
+        <!-- Selection Panel -->
+        <div class="selection-panel">
+            <div class="selection-grid">
+                <div class="crop-select-wrapper">
+                    <label class="crop-select-label">🌾 Select Your Crop / अपना पीक चुनें</label>
+                    <select id="cropSelect" class="crop-select">
+                        <option value="">-- Choose Crop / पीक निवडा --</option>
+                        <option value="tomato">🍅 टोमॅटो (Tomato) - Nashik, Pune</option>
+                        <option value="grapes">🍇 द्राक्षे (Grapes) - Nashik, Sangli</option>
+                        <option value="pomegranate">🍎 डाळिंब (Pomegranate) - Solapur</option>
+                        <option value="orange">🍊 संत्री (Orange) - Nagpur</option>
+                        <option value="cotton">🌿 कापूस (Cotton) - Yavatmal, Akola</option>
+                        <option value="sugarcane">🎋 ऊस (Sugarcane) - Kolhapur, Sangli</option>
+                        <option value="banana">🍌 केळी (Banana) - Jalgaon</option>
+                        <option value="soybean">🌱 सोयाबीन (Soybean) - Latur, Nanded</option>
+                        <option value="wheat">🌾 गहू (Wheat) - Nashik, Ahmednagar</option>
+                        <option value="rice">🌾 भात (Rice) - Konkan</option>
+                    </select>
+                </div>
+                <button class="find-btn" onclick="findFertilizers()">
+                    <span>🔍</span>
+                    <span>Find Best Fertilizers / सर्वोत्तम खत शोधा</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Results Container -->
+        <div id="resultsContainer">
+            <!-- Initial State -->
+            <div class="no-results" id="initialState">
+                <i>🌱</i>
+                <h3 style="color: var(--text-white); margin-bottom: var(--space-2);">कोणतेही पीक निवडलेले नाही</h3>
+                <p style="color: var(--text-muted);">कृपया वर दिलेल्या पर्यायातून तुमचे पीक निवडा</p>
+            </div>
+
+            <!-- Loading State (Hidden by default) -->
+            <div class="loading-state" id="loadingState" style="display: none;">
+                <div class="loading-spinner"></div>
+                <p style="color: var(--text-secondary);">सर्वोत्तम खत शोधत आहे...</p>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">Analyzing crop requirements...</p>
+            </div>
+
+            <!-- Results (Hidden by default) -->
+            <div id="fertilizerResults" style="display: none;">
+                <!-- Will be filled by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Fertilizer database
+        const fertilizerData = {
+            tomato: {
+                cropName: 'टोमॅटो (Tomato)',
+                cropIcon: '🍅',
+                fertilizers: [
+                    {
+                        name: 'NPK 19:19:19',
+                        type: 'Water Soluble Fertilizer',
+                        description: 'बैलेंस्ड NPK फर्टिलाइज़र - फूल और फल लगने के लिए सबसे अच्छा',
+                        npk: '19:19:19',
+                        quantity: '25 kg',
+                        price: '₹1,850',
+                        rating: 4.8,
+                        reviews: '2.3k',
+                        benefits: ['फूल लगने में मदद', 'फल की गुणवत्ता बढ़ाए', 'जड़ विकास'],
+                        link: 'https://www.amazon.in/s?k=npk+19:19:19',
+                        rank: 1
+                    },
+                    {
+                        name: 'Mahadhan 12:32:16',
+                        type: 'Water Soluble',
+                        description: 'फॉस्फोरस युक्त - नर्सरी और शुरुआती विकास के लिए',
+                        npk: '12:32:16',
+                        quantity: '25 kg',
+                        price: '₹2,100',
+                        rating: 4.7,
+                        reviews: '1.8k',
+                        benefits: ['जड़ विकास', 'शुरुआती वृद्धि', 'फूल लगने में सहायक'],
+                        link: 'https://www.amazon.in/s?k=12:32:16+fertilizer',
+                        rank: 2
+                    },
+                    {
+                        name: 'Potassium Nitrate 13:0:45',
+                        type: 'Specialty Fertilizer',
+                        description: 'पोटैशियम युक्त - फल के रंग और मिठास के लिए',
+                        npk: '13:0:45',
+                        quantity: '25 kg',
+                        price: '₹2,450',
+                        rating: 4.6,
+                        reviews: '1.2k',
+                        benefits: ['फल का रंग सुधारे', 'मिठास बढ़ाए', 'रोग प्रतिरोधक'],
+                        link: 'https://www.amazon.in/s?k=potassium+nitrate',
+                        rank: 3
+                    },
+                    {
+                        name: 'Vermicompost',
+                        type: 'Organic Fertilizer',
+                        description: 'जैविक खाद - मिट्टी की सेहत के लिए',
+                        npk: '1.5:1:1.5',
+                        quantity: '50 kg',
+                        price: '₹800',
+                        rating: 4.9,
+                        reviews: '3.5k',
+                        benefits: ['मिट्टी में सुधार', 'जैविक खेती', 'लंबे समय तक असर'],
+                        link: 'https://www.amazon.in/s?k=vermicompost',
+                        rank: 4
+                    },
+                    {
+                        name: 'Calcium Nitrate',
+                        type: 'Secondary Nutrient',
+                        description: 'कैल्शियम युक्त - फल सड़न रोकने के लिए',
+                        npk: '15.5:0:0 + Ca',
+                        quantity: '25 kg',
+                        price: '₹1,650',
+                        rating: 4.5,
+                        reviews: '950',
+                        benefits: ['फल सड़न रोके', 'सेल वॉल मजबूत', 'शेल्फ लाइफ बढ़ाए'],
+                        link: 'https://www.amazon.in/s?k=calcium+nitrate',
+                        rank: 5
+                    }
+                ]
+            },
+            grapes: {
+                cropName: 'द्राक्षे (Grapes)',
+                cropIcon: '🍇',
+                fertilizers: [
+                    {
+                        name: '19:19:19 + TE',
+                        type: 'Water Soluble',
+                        description: 'द्राक्ष बागांसाठी संतुलित खत - सर्व हंगामासाठी',
+                        npk: '19:19:19 + TE',
+                        quantity: '25 kg',
+                        price: '₹1,950',
+                        rating: 4.9,
+                        reviews: '3.1k',
+                        benefits: ['द्राक्ष गुच्छ वाढ', 'फळधारणा वाढ', 'रंग सुधार'],
+                        link: 'https://www.amazon.in/s?k=19:19:19+te',
+                        rank: 1
+                    },
+                    {
+                        name: 'Mono Potassium Phosphate',
+                        type: 'Specialty',
+                        description: '0:52:34 - फूल आणि फळ लागणीसाठी सर्वोत्तम',
+                        npk: '0:52:34',
+                        quantity: '25 kg',
+                        price: '₹2,850',
+                        rating: 4.8,
+                        reviews: '2.2k',
+                        benefits: ['फूल लगने में मदद', 'फल सेटिंग बढ़ाए', 'गुणवत्ता सुधारे'],
+                        link: 'https://www.amazon.in/s?k=MKP+fertilizer',
+                        rank: 2
+                    },
+                    {
+                        name: 'SOP (00:00:50)',
+                        type: 'Potassic Fertilizer',
+                        description: 'सल्फेट ऑफ पोटॅश - द्राक्ष गोडीसाठी',
+                        npk: '0:0:50',
+                        quantity: '25 kg',
+                        price: '₹2,250',
+                        rating: 4.7,
+                        reviews: '1.5k',
+                        benefits: ['मिठास बढ़ाए', 'रंग सुधारे', 'फल का आकार'],
+                        link: 'https://www.amazon.in/s?k=SOP+fertilizer',
+                        rank: 3
+                    }
+                ]
+            },
+            pomegranate: {
+                cropName: 'डाळिंब (Pomegranate)',
+                cropIcon: '🍎',
+                fertilizers: [
+                    {
+                        name: 'Multi-K (13:0:45)',
+                        type: 'Potassium Nitrate',
+                        description: 'डाळिंब फळाचा रंग आणि आकार सुधारण्यासाठी',
+                        npk: '13:0:45',
+                        quantity: '25 kg',
+                        price: '₹2,450',
+                        rating: 4.8,
+                        reviews: '2.1k',
+                        benefits: ['फल का रंग लाल', 'आकार बड़ा', 'चमक बढ़ाए'],
+                        link: 'https://www.amazon.in/s?k=13:0:45',
+                        rank: 1
+                    },
+                    {
+                        name: '12:61:00',
+                        type: 'Mono Ammonium Phosphate',
+                        description: 'फळधारणा वाढीसाठी फॉस्फोरस युक्त खत',
+                        npk: '12:61:00',
+                        quantity: '25 kg',
+                        price: '₹2,150',
+                        rating: 4.6,
+                        reviews: '1.3k',
+                        benefits: ['जड़ विकास', 'फूल लगने में', 'फल धारण'],
+                        link: 'https://www.amazon.in/s?k=12:61:00',
+                        rank: 2
+                    }
+                ]
+            },
+            cotton: {
+                cropName: 'कापूस (Cotton)',
+                cropIcon: '🌿',
+                fertilizers: [
+                    {
+                        name: 'DAP (18:46:00)',
+                        type: 'Base Fertilizer',
+                        description: 'कापूस लागवडीसाठी आवश्यक खत',
+                        npk: '18:46:00',
+                        quantity: '50 kg',
+                        price: '₹1,350',
+                        rating: 4.9,
+                        reviews: '5.2k',
+                        benefits: ['जड़ विकास', 'फूल लगने में', 'बोंड विकास'],
+                        link: 'https://www.amazon.in/s?k=DAP+fertilizer',
+                        rank: 1
+                    },
+                    {
+                        name: 'Urea (46:00:00)',
+                        type: 'Nitrogen Fertilizer',
+                        description: 'नत्र युक्त खत - वाढीसाठी आवश्यक',
+                        npk: '46:00:00',
+                        quantity: '50 kg',
+                        price: '₹850',
+                        rating: 4.7,
+                        reviews: '4.8k',
+                        benefits: ['वनस्पती वाढ', 'पाने गडद हिरवी', 'फांद्या वाढ'],
+                        link: 'https://www.amazon.in/s?k=urea+fertilizer',
+                        rank: 2
+                    }
+                ]
+            },
+            sugarcane: {
+                cropName: 'ऊस (Sugarcane)',
+                cropIcon: '🎋',
+                fertilizers: [
+                    {
+                        name: 'Potash 60%',
+                        type: 'MOP',
+                        description: 'ऊस पिकासाठी उच्च प्रतीचे पोटॅश खत',
+                        npk: '0:0:60',
+                        quantity: '50 kg',
+                        price: '₹1,550',
+                        rating: 4.8,
+                        reviews: '3.4k',
+                        benefits: ['उसाची जाडी', 'गोडवा वाढ', 'उत्पन्न वाढ'],
+                        link: 'https://www.amazon.in/s?k=MOP+fertilizer',
+                        rank: 1
+                    },
+                    {
+                        name: 'Super Phosphate',
+                        type: 'Phosphatic',
+                        description: 'मुळांच्या वाढीसाठी फॉस्फरस',
+                        npk: '0:16:00',
+                        quantity: '50 kg',
+                        price: '₹950',
+                        rating: 4.6,
+                        reviews: '2.1k',
+                        benefits: ['मूळ वाढ', 'कांडी वाढ', 'रोग प्रतिकार'],
+                        link: 'https://www.amazon.in/s?k=SSP+fertilizer',
+                        rank: 2
+                    }
+                ]
+            }
+        };
+
+        function findFertilizers() {
+            const cropSelect = document.getElementById('cropSelect');
+            const selectedCrop = cropSelect.value;
+            
+            // Hide initial state
+            document.getElementById('initialState').style.display = 'none';
+            
+            if (!selectedCrop) {
+                // Show error if no crop selected
+                document.getElementById('initialState').style.display = 'block';
+                document.getElementById('initialState').innerHTML = `
+                    <i>⚠️</i>
+                    <h3 style="color: var(--text-white); margin-bottom: var(--space-2);">कृपया पीक निवडा</h3>
+                    <p style="color: var(--text-muted);">Please select a crop first</p>
+                `;
+                return;
+            }
+            
+            // Show loading
+            document.getElementById('loadingState').style.display = 'block';
+            document.getElementById('fertilizerResults').style.display = 'none';
+            
+            // Simulate loading delay (2 seconds)
+            setTimeout(() => {
+                // Hide loading
+                document.getElementById('loadingState').style.display = 'none';
+                
+                // Get fertilizer data for selected crop
+                const data = fertilizerData[selectedCrop];
+                
+                if (data) {
+                    displayFertilizers(data);
+                } else {
+                    // Show no data message
+                    document.getElementById('fertilizerResults').style.display = 'block';
+                    document.getElementById('fertilizerResults').innerHTML = `
+                        <div class="no-results">
+                            <i>🌱</i>
+                            <h3 style="color: var(--text-white); margin-bottom: var(--space-2);">कोई खत डेटा नहीं</h3>
+                            <p style="color: var(--text-muted);">इस पिक के लिए अभी डेटा उपलब्ध नहीं है</p>
+                        </div>
+                    `;
+                }
+            }, 2000);
+        }
+
+        function displayFertilizers(data) {
+            const resultsDiv = document.getElementById('fertilizerResults');
+            resultsDiv.style.display = 'block';
+            
+            let fertilizersHTML = `
+                <div class="results-section">
+                    <div class="section-header">
+                        <h2>सर्वोत्तम खत / Best Fertilizers</h2>
+                        <div class="crop-name-badge">
+                            <span>${data.cropIcon}</span>
+                            <span>${data.cropName}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="why-these">
+                        <h3>
+                            <span>🎯</span>
+                            <span>ये खत क्यों सबसे अच्छे हैं? / Why these are the best?</span>
+                        </h3>
+                        <div class="why-grid">
+                            <div class="why-item">
+                                <i>✓</i>
+                                <span>पिकाच्या गरजेनुसार / Crop-specific NPK ratio</span>
+                            </div>
+                            <div class="why-item">
+                                <i>✓</i>
+                                <span>महाराष्ट्र शेतकऱ्यांनी ट्रस्टेड / Trusted by Maharashtra farmers</span>
+                            </div>
+                            <div class="why-item">
+                                <i>✓</i>
+                                <span>उत्पादनात 30% वाढ / 30% yield increase</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="fertilizer-grid">
+            `;
+            
+            // Add fertilizer cards
+            data.fertilizers.forEach((fert, index) => {
+                const rankClass = index === 0 ? 'top1' : (index === 1 ? 'top2' : (index === 2 ? 'top3' : ''));
+                
+                fertilizersHTML += `
+                    <div class="fertilizer-card">
+                        <div class="card-header">
+                            <div class="rank-badge ${rankClass}">#${index + 1}</div>
+                            <div class="fertilizer-name">
+                                <h3>${fert.name}</h3>
+                                <div class="fertilizer-type">${fert.type}</div>
+                            </div>
+                        </div>
+                        
+                        <p class="fertilizer-desc">${fert.description}</p>
+                        
+                        <div class="specs-grid">
+                            <div class="spec-item">
+                                <div class="spec-label">NPK Ratio</div>
+                                <div class="spec-value">${fert.npk}</div>
+                            </div>
+                            <div class="spec-item">
+                                <div class="spec-label">Packing</div>
+                                <div class="spec-value">${fert.quantity}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="specs-grid">
+                            ${fert.benefits.map(benefit => `
+                                <div class="spec-item">
+                                    <div style="color: var(--green-400); font-size: 0.8rem;">✓ ${benefit}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        
+                        <div class="price-section">
+                            <div>
+                                <div class="price">${fert.price} <small>per bag</small></div>
+                            </div>
+                            <div class="rating">
+                                ${getStarRating(fert.rating)}
+                                <span>(${fert.reviews})</span>
+                            </div>
+                        </div>
+                        
+                        <a href="${fert.link}" target="_blank" class="buy-btn">
+                            <span>🛒</span>
+                            <span>Buy Now / खरेदी करा</span>
+                        </a>
+                    </div>
+                `;
+            });
+            
+            fertilizersHTML += `
+                    </div>
+                    
+                    <div class="glass-card" style="margin-top: var(--space-6); text-align: center;">
+                        <p style="color: var(--text-secondary);">
+                            <strong>💡 शेतकरी टिप:</strong> खत वापरण्यापूर्वी माती परीक्षण करून घ्या. 
+                            जमिनीची गरज ओळखूनच खत वापरा.
+                        </p>
+                    </div>
+                </div>
+            `;
+            
+            resultsDiv.innerHTML = fertilizersHTML;
+        }
+
+        function getStarRating(rating) {
+            let stars = '';
+            for (let i = 1; i <= 5; i++) {
+                if (i <= Math.floor(rating)) {
+                    stars += '★';
+                } else if (i - 0.5 <= rating) {
+                    stars += '⯨';
+                } else {
+                    stars += '☆';
+                }
+            }
+            return stars;
+        }
+
+        // Reset when crop selection changes
+        document.getElementById('cropSelect').addEventListener('change', function() {
+            if (!this.value) {
+                document.getElementById('initialState').style.display = 'block';
+                document.getElementById('fertilizerResults').style.display = 'none';
+                document.getElementById('loadingState').style.display = 'none';
+            }
+        });
+    </script>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

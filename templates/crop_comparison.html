@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crop Comparison Tool - Smart Greenhouse</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .comparison-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .vs-circle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #f39c12, #e74c3c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(243, 156, 18, 0.3);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .crop-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 30px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .crop-card:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .crop-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .crop-icon {
+            font-size: 5rem;
+            margin-bottom: 1rem;
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));
+        }
+        
+        .crop-title {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff, #cbd5e1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .parameter-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .parameter-row:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateX(5px);
+        }
+        
+        .parameter-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #94a3b8;
+        }
+        
+        .parameter-value {
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+        
+        .good-value {
+            color: #10b981;
+        }
+        
+        .bad-value {
+            color: #ef4444;
+        }
+        
+        .suitability-meter {
+            width: 100%;
+            height: 10px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+        
+        .meter-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #f43f5e, #f97316, #eab308, #10b981);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+        
+        .comparison-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin: 0.25rem;
+        }
+        
+        .badge-winner {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: black;
+        }
+        
+        .badge-loser {
+            background: rgba(100, 116, 139, 0.3);
+            color: #94a3b8;
+        }
+        
+        .select-container {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+        
+        .crop-select {
+            width: 100%;
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 50px;
+            color: white;
+            cursor: pointer;
+            appearance: none;
+            transition: all 0.3s ease;
+        }
+        
+        .crop-select:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: rgba(255,255,255,0.2);
+        }
+        
+        .crop-select option {
+            background: #1e293b;
+            color: white;
+        }
+        
+        .select-arrow {
+            position: absolute;
+            right: 1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: white;
+            pointer-events: none;
+        }
+        
+        .comparison-result {
+            margin-top: 3rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+            border-radius: 30px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .winner-announcement {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .recommendation-box {
+            background: rgba(16, 185, 129, 0.1);
+            border-left: 4px solid #10b981;
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-top: 1rem;
+        }
+        
+        @media (max-width: 1024px) {
+            .comparison-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .vs-circle {
+                font-size: 2rem;
+                margin: 1rem 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <span class="logo-icon">🌿</span>
+            <span>GreenHouse AI</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="{{ url_for('auth.index') }}">Home</a></li>
+            
+            <li><a href="{{ url_for('detection.detect') }}">Detection</a></li>
+            
+            <li><a href="{{ url_for('crop_recommendation') }}">AI Recommend</a></li>
+            <li><a href="{{ url_for('fertilizer_guide') }}">Fertilizer Guide</a></li>
+            <li><a href="{{ url_for('dashboard.dashboard') }}">Dashboard</a></li>
+            <li><a href="{{ url_for('crop_comparison') }}" class="active">Comparison</a></li>
+        </ul>
+    </nav>
+
+    <div style="max-width: 1400px; margin: 2rem auto; padding: 0 2rem;">
+        <!-- Header -->
+        <div style="text-align: center; margin-bottom: 4rem;">
+            <h1 style="font-size: 3.5rem; margin-bottom: 1rem;">
+                🌱 Crop Comparison Tool 
+                <span style="background: linear-gradient(135deg, #f39c12, #e74c3c); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">🔥</span>
+            </h1>
+            <p style="color: #94a3b8; font-size: 1.2rem;">Compare two crops and find the best fit for your greenhouse</p>
+        </div>
+
+        <!-- Selection Row -->
+        <div style="display: grid; grid-template-columns: 1fr 0.5fr 1fr; gap: 2rem; align-items: center; margin-bottom: 3rem;">
+            <div class="select-container">
+                <select id="crop1" class="crop-select" onchange="compareCrops()">
+                    <option value="Tomato">🍅 Tomato (नाशिक)</option>
+                    <option value="Lettuce">🥬 Lettuce (महाबळेश्वर)</option>
+                    <option value="Capsicum">🌶️ Capsicum (नाशिक)</option>
+                    <option value="Brinjal">🍆 Brinjal (कोल्हापूर)</option>
+                    <option value="Grapes">🍇 Grapes (नाशिक)</option>
+                    <option value="Pomegranate">🍎 Pomegranate (सोलापूर)</option>
+                    <option value="Orange">🍊 Orange (नागपूर)</option>
+                    <option value="Cotton">🌿 Cotton (यवतमाळ)</option>
+                    <option value="Sugarcane">🎋 Sugarcane (कोल्हापूर)</option>
+                </select>
+                <span class="select-arrow">▼</span>
+            </div>
+
+            <div class="vs-circle">VS</div>
+
+            <div class="select-container">
+                <select id="crop2" class="crop-select" onchange="compareCrops()">
+                    <option value="Lettuce">🥬 Lettuce (महाबळेश्वर)</option>
+                    <option value="Tomato">🍅 Tomato (नाशिक)</option>
+                    <option value="Capsicum">🌶️ Capsicum (नाशिक)</option>
+                    <option value="Brinjal">🍆 Brinjal (कोल्हापूर)</option>
+                    <option value="Grapes">🍇 Grapes (नाशिक)</option>
+                    <option value="Pomegranate">🍎 Pomegranate (सोलापूर)</option>
+                    <option value="Orange">🍊 Orange (नागपूर)</option>
+                    <option value="Cotton">🌿 Cotton (यवतमाळ)</option>
+                    <option value="Sugarcane">🎋 Sugarcane (कोल्हापूर)</option>
+                </select>
+                <span class="select-arrow">▼</span>
+            </div>
+        </div>
+
+        <!-- Comparison Cards -->
+        <div class="comparison-container" id="comparisonContainer">
+            <!-- Crop 1 Card -->
+            <div class="crop-card" id="crop1Card">
+                <div class="crop-header">
+                    <div class="crop-icon" id="crop1Icon">🍅</div>
+                    <div class="crop-title" id="crop1Title">Tomato</div>
+                    <div style="color: #94a3b8; margin-top: 0.5rem;" id="crop1Region">नाशिक, पुणे, सातारा</div>
+                </div>
+
+                <div style="margin: 2rem 0;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span>Suitability Score</span>
+                        <span id="crop1Score">85%</span>
+                    </div>
+                    <div class="suitability-meter">
+                        <div class="meter-fill" id="crop1Meter" style="width: 85%;"></div>
+                    </div>
+                </div>
+
+                <div id="crop1Params">
+                    <!-- Params will be filled by JS -->
+                </div>
+            </div>
+
+            <!-- VS Middle (empty) -->
+            <div style="display: flex; align-items: center; justify-content: center;">
+                <div class="vs-circle">⚡</div>
+            </div>
+
+            <!-- Crop 2 Card -->
+            <div class="crop-card" id="crop2Card">
+                <div class="crop-header">
+                    <div class="crop-icon" id="crop2Icon">🥬</div>
+                    <div class="crop-title" id="crop2Title">Lettuce</div>
+                    <div style="color: #94a3b8; margin-top: 0.5rem;" id="crop2Region">पुणे, महाबळेश्वर</div>
+                </div>
+
+                <div style="margin: 2rem 0;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span>Suitability Score</span>
+                        <span id="crop2Score">75%</span>
+                    </div>
+                    <div class="suitability-meter">
+                        <div class="meter-fill" id="crop2Meter" style="width: 75%;"></div>
+                    </div>
+                </div>
+
+                <div id="crop2Params">
+                    <!-- Params will be filled by JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Comparison Result -->
+        <div class="comparison-result" id="comparisonResult">
+            <!-- Result will be filled by JS -->
+        </div>
+
+        <!-- Quick Compare Buttons -->
+        <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 3rem; flex-wrap: wrap;">
+            <button class="btn btn-secondary" onclick="quickCompare('Tomato', 'Lettuce')">
+                🍅 टोमॅटो vs 🥬 लेट्यूस
+            </button>
+            <button class="btn btn-secondary" onclick="quickCompare('Grapes', 'Pomegranate')">
+                🍇 द्राक्षे vs 🍎 डाळिंब
+            </button>
+            <button class="btn btn-secondary" onclick="quickCompare('Cotton', 'Sugarcane')">
+                🌿 कापूस vs 🎋 ऊस
+            </button>
+            <button class="btn btn-secondary" onclick="quickCompare('Orange', 'Capsicum')">
+                🍊 संत्री vs 🌶️ ढोबळी मिरची
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Crop database
+        const crops = {
+            'Tomato': {
+                icon: '🍅',
+                name: 'Tomato',
+                marathi: 'टोमॅटो',
+                region: 'नाशिक, पुणे, सातारा',
+                temp: { min: 18, max: 30 },
+                humidity: { min: 60, max: 80 },
+                soil: { min: 40, max: 100 },
+                light: { min: 50, max: 90 },
+                score: 85,
+                season: 'खरीप/रब्बी'
+            },
+            'Lettuce': {
+                icon: '🥬',
+                name: 'Lettuce',
+                marathi: 'लेट्यूस',
+                region: 'पुणे, महाबळेश्वर',
+                temp: { min: 10, max: 24 },
+                humidity: { min: 65, max: 85 },
+                soil: { min: 50, max: 100 },
+                light: { min: 40, max: 70 },
+                score: 75,
+                season: 'रब्बी'
+            },
+            'Capsicum': {
+                icon: '🌶️',
+                name: 'Capsicum',
+                marathi: 'ढोबळी मिरची',
+                region: 'नाशिक, पुणे, सातारा',
+                temp: { min: 16, max: 28 },
+                humidity: { min: 50, max: 75 },
+                soil: { min: 45, max: 100 },
+                light: { min: 50, max: 85 },
+                score: 80,
+                season: 'खरीप/रब्बी'
+            },
+            'Grapes': {
+                icon: '🍇',
+                name: 'Grapes',
+                marathi: 'द्राक्षे',
+                region: 'नाशिक, सांगली, सोलापूर',
+                temp: { min: 15, max: 35 },
+                humidity: { min: 45, max: 65 },
+                soil: { min: 50, max: 100 },
+                light: { min: 70, max: 100 },
+                score: 90,
+                season: 'रब्बी'
+            },
+            'Pomegranate': {
+                icon: '🍎',
+                name: 'Pomegranate',
+                marathi: 'डाळिंब',
+                region: 'सोलापूर, सांगली, नाशिक',
+                temp: { min: 15, max: 38 },
+                humidity: { min: 35, max: 55 },
+                soil: { min: 40, max: 75 },
+                light: { min: 80, max: 100 },
+                score: 88,
+                season: 'वार्षिक'
+            },
+            'Orange': {
+                icon: '🍊',
+                name: 'Orange',
+                marathi: 'संत्रे',
+                region: 'नागपूर, अमरावती, वर्धा',
+                temp: { min: 10, max: 35 },
+                humidity: { min: 40, max: 70 },
+                soil: { min: 45, max: 85 },
+                light: { min: 70, max: 95 },
+                score: 92,
+                season: 'रब्बी'
+            },
+            'Cotton': {
+                icon: '🌿',
+                name: 'Cotton',
+                marathi: 'कापूस',
+                region: 'यवतमाळ, अकोला, अमरावती',
+                temp: { min: 22, max: 36 },
+                humidity: { min: 40, max: 65 },
+                soil: { min: 35, max: 80 },
+                light: { min: 70, max: 100 },
+                score: 82,
+                season: 'खरीप'
+            },
+            'Sugarcane': {
+                icon: '🎋',
+                name: 'Sugarcane',
+                marathi: 'ऊस',
+                region: 'कोल्हापूर, सांगली, सोलापूर',
+                temp: { min: 20, max: 35 },
+                humidity: { min: 60, max: 85 },
+                soil: { min: 60, max: 100 },
+                light: { min: 80, max: 100 },
+                score: 95,
+                season: 'वार्षिक'
+            },
+            'Brinjal': {
+                icon: '🍆',
+                name: 'Brinjal',
+                marathi: 'वांगी',
+                region: 'कोल्हापूर, पुणे, अहमदनगर',
+                temp: { min: 20, max: 32 },
+                humidity: { min: 55, max: 75 },
+                soil: { min: 45, max: 100 },
+                light: { min: 60, max: 90 },
+                score: 78,
+                season: 'वार्षिक'
+            }
+        };
+
+        // Initialize with default comparison
+        window.onload = function() {
+            compareCrops();
+        };
+
+        function compareCrops() {
+            const crop1 = document.getElementById('crop1').value;
+            const crop2 = document.getElementById('crop2').value;
+            
+            updateCropCard('crop1', crop1);
+            updateCropCard('crop2', crop2);
+            updateComparisonResult(crop1, crop2);
+        }
+
+        function updateCropCard(cardId, cropName) {
+            const crop = crops[cropName];
+            if (!crop) return;
+
+            // Update header
+            document.getElementById(`${cardId}Icon`).textContent = crop.icon;
+            document.getElementById(`${cardId}Title`).textContent = crop.name;
+            document.getElementById(`${cardId}Region`).textContent = crop.region;
+            
+            // Update score
+            document.getElementById(`${cardId}Score`).textContent = crop.score + '%';
+            document.getElementById(`${cardId}Meter`).style.width = crop.score + '%';
+
+            // Update parameters
+            const paramsDiv = document.getElementById(`${cardId}Params`);
+            paramsDiv.innerHTML = `
+                <div class="parameter-row">
+                    <span class="parameter-label">🌡️ Temperature</span>
+                    <span class="parameter-value">${crop.temp.min}-${crop.temp.max}°C</span>
+                </div>
+                <div class="parameter-row">
+                    <span class="parameter-label">💧 Humidity</span>
+                    <span class="parameter-value">${crop.humidity.min}-${crop.humidity.max}%</span>
+                </div>
+                <div class="parameter-row">
+                    <span class="parameter-label">🌱 Soil Moisture</span>
+                    <span class="parameter-value">${crop.soil.min}%+</span>
+                </div>
+                <div class="parameter-row">
+                    <span class="parameter-label">☀️ Light</span>
+                    <span class="parameter-value">${crop.light.min}-${crop.light.max}%</span>
+                </div>
+                <div class="parameter-row">
+                    <span class="parameter-label">📅 Season</span>
+                    <span class="parameter-value">${crop.season}</span>
+                </div>
+            `;
+        }
+
+        function updateComparisonResult(crop1Name, crop2Name) {
+            const crop1 = crops[crop1Name];
+            const crop2 = crops[crop2Name];
+            
+            let winner = crop1.score > crop2.score ? crop1 : crop2;
+            let loser = crop1.score > crop2.score ? crop2 : crop1;
+            
+            let resultDiv = document.getElementById('comparisonResult');
+            
+            resultDiv.innerHTML = `
+                <div class="winner-announcement">
+                    Result: ${winner.icon} ${winner.name} (${winner.marathi})
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                    <div>
+                        <h3 style="color: #10b981; margin-bottom: 1rem;">✅ Why ${winner.name}?</h3>
+                        <ul style="list-style: none; padding: 0;">
+                            <li style="margin-bottom: 0.8rem;">✓ Better suitability score: ${winner.score}% vs ${loser.score}%</li>
+                            <li style="margin-bottom: 0.8rem;">✓ Ideal for ${winner.region}</li>
+                            <li style="margin-bottom: 0.8rem;">✓ Perfect for ${winner.season} season</li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h3 style="color: #f97316; margin-bottom: 1rem;">📊 Quick Comparison</h3>
+                        <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 15px;">
+                            <p><strong>Temperature:</strong> ${crop1.temp.min}-${crop1.temp.max}°C vs ${crop2.temp.min}-${crop2.temp.max}°C</p>
+                            <p><strong>Humidity:</strong> ${crop1.humidity.min}-${crop1.humidity.max}% vs ${crop2.humidity.min}-${crop2.humidity.max}%</p>
+                            <p><strong>Soil Moisture:</strong> ${crop1.soil.min}%+ vs ${crop2.soil.min}%+</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="recommendation-box">
+                    <strong>💡 Recommendation:</strong> 
+                    ${winner.name} is ${Math.abs(winner.score - loser.score)}% more suitable for Maharashtra conditions. 
+                    Best grown in ${winner.region} during ${winner.season} season.
+                </div>
+            `;
+        }
+
+        function quickCompare(crop1, crop2) {
+            document.getElementById('crop1').value = crop1;
+            document.getElementById('crop2').value = crop2;
+            compareCrops();
+            
+            // Scroll to comparison
+            document.getElementById('comparisonContainer').scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

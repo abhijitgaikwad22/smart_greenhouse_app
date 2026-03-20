@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Smart Greenhouse</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <span class="logo-icon">🌿</span>
+            <span>GreenHouse AI</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="{{ url_for('auth.index') }}">Home</a></li>
+            
+            <li><a href="{{ url_for('detection.detect') }}">Detection</a></li>
+            <li><a href="{{ url_for('crop_comparison') }}">Comparison</a></li>
+            <li><a href="{{ url_for('crop_recommendation') }}">AI Recommend</a></li>
+            <li><a href="{{ url_for('fertilizer_guide') }}">Fertilizer Guide</a></li>
+            <li><a href="{{ url_for('dashboard.dashboard') }}" class="active">Dashboard</a></li>
+            <li><a href="{{ url_for('auth.logout') }}" class="btn-login">Logout</a></li>
+        </ul>
+    </nav>
+
+    <div style="max-width: 1400px; margin: 2rem auto; padding: 0 1rem;">
+        <h1 style="color: white; text-align: center; margin-bottom: 2rem;">📊 Analytics Dashboard</h1>
+
+        <!-- Stats Cards -->
+        <div class="dashboard-stats">
+            <div class="stat-card">
+                <div class="stat-label">Total Detections</div>
+                <div class="stat-value">{{ total_records }}</div>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);">
+                <div class="stat-label">Good Conditions</div>
+                <div class="stat-value">{{ good_records }}</div>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);">
+                <div class="stat-label">Attention Required</div>
+                <div class="stat-value">{{ attention_records }}</div>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);">
+                <div class="stat-label">Critical Issues</div>
+                <div class="stat-value">{{ critical_records }}</div>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);">
+                <div class="stat-label">Avg. Score</div>
+                <div class="stat-value">{{ avg_score }}%</div>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem;">
+            <!-- Detection History -->
+            <div class="glass-card">
+                <h2 style="margin-bottom: 1.5rem;">📋 Detection History</h2>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>Crop</th>
+                                <th>Temp</th>
+                                <th>Humidity</th>
+                                <th>Soil</th>
+                                <th>Light</th>
+                                <th>Status</th>
+                                <th>Score</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for record in history %}
+                            <tr>
+                                <td>{{ record.Timestamp }}</td>
+                                <td>{{ record.Crop }}</td>
+                                <td>{{ record.Temperature }}°C</td>
+                                <td>{{ record.Humidity }}%</td>
+                                <td>{{ record.Soil_Moisture }}%</td>
+                                <td>{{ record.Light }}%</td>
+                                <td>
+                                    <span class="status-badge 
+                                        {% if record.Status == 'GOOD' %}good
+                                        {% elif record.Status == 'ATTENTION REQUIRED' %}attention
+                                        {% else %}critical{% endif %}">
+                                        {{ record.Status }}
+                                    </span>
+                                </td>
+                                <td>{{ record.Score }}%</td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="8" style="text-align: center; padding: 2rem;">
+                                    No detection history available
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div style="text-align: right; margin-top: 1rem;">
+                    <a href="{{ url_for('detection.export_csv') }}" class="btn btn-secondary">Export History CSV</a>
+                </div>
+            </div>
+
+            <!-- Recent Alerts -->
+            <div class="glass-card">
+                <h2 style="margin-bottom: 1.5rem;">🔔 Recent Alerts</h2>
+                {% if recent_alerts %}
+                    {% for alert in recent_alerts %}
+                    <div class="alert alert-warning" style="margin-bottom: 1rem;">
+                        <strong>{{ alert.Crop }}</strong><br>
+                        <small>{{ alert.Timestamp }}</small><br>
+                        Status: {{ alert.Status }} | Score: {{ alert.Score }}%
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div style="text-align: center; padding: 2rem;">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">✅</div>
+                        <p>No recent alerts</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Crop Summary -->
+        <div class="glass-card" style="margin-top: 2rem;">
+            <h2 style="margin-bottom: 1.5rem;">🌱 Crop Summary</h2>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+                <div style="text-align: center;">
+                    <h3>🍅 Tomato</h3>
+                    <p>Ideal: 18-30°C, 60-80% RH</p>
+                </div>
+                <div style="text-align: center;">
+                    <h3>🥬 Lettuce</h3>
+                    <p>Ideal: 10-24°C, 65-85% RH</p>
+                </div>
+                <div style="text-align: center;">
+                    <h3>🌶️ Capsicum</h3>
+                    <p>Ideal: 16-28°C, 50-75% RH</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

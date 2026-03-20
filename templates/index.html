@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Greenhouse | Intelligent Environment Monitoring</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="logo">
+            <span class="logo-icon">🌿</span>
+            <span>GreenHouse AI</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#features">Features</a></li>
+            <li><a href="#benefits">Benefits</a></li>
+            <li><a href="{{ url_for('about') }}">About</a></li>
+            <li><a href="{{ url_for('auth.login') }}" class="btn-primary" style="color: white;">Login to Start Detection</a></li>
+            <!-- <li><a href="{{ url_for('detection.detect') }}" class="btn-primary" style="color: white;">Start Detection</a></li> -->
+        </ul>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-badge">🚀 Smart Agriculture Solution</div>
+            <h1>Intelligent <span>Greenhouse</span><br>Environment Monitoring</h1>
+            <p>Transform your greenhouse with AI-powered environmental monitoring. Get real-time insights, alerts, and recommendations for optimal crop growth.</p>
+            <div class="hero-buttons">
+                <a href="{{ url_for('auth.login') }}" class="btn btn-primary">Start Detection</a>
+                <a href="#features" class="btn btn-secondary">Learn More</a>
+            </div>
+        </div>
+        <div class="hero-image">
+            <div class="glass-card" style="padding: 2rem;">
+                <div style="font-size: 4rem; text-align: center;">🌱</div>
+                <h3 style="text-align: center; margin: 1rem 0;">Smart Monitoring</h3>
+                <div style="display: flex; gap: 1rem; justify-content: center;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 1.5rem; color: var(--primary-color);">24/7</div>
+                        <small>Monitoring</small>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 1.5rem; color: var(--primary-color);">98%</div>
+                        <small>Accuracy</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" style="padding: 4rem 5%; background: rgba(255,255,255,0.05);">
+        <h2 style="text-align: center; color: white; font-size: 2.5rem; margin-bottom: 3rem;">Smart Features</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🌡️</div>
+                <h3>Real-time Monitoring</h3>
+                <p>Monitor temperature, humidity, soil moisture, and light intensity in real-time.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🤖</div>
+                <h3>AI-Powered Analysis</h3>
+                <p>Get intelligent recommendations based on crop-specific optimal conditions.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>Analytics Dashboard</h3>
+                <p>Visualize trends and patterns with our comprehensive analytics dashboard.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⚠️</div>
+                <h3>Smart Alerts</h3>
+                <p>Receive instant alerts when conditions deviate from optimal ranges.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📱</div>
+                <h3>Mobile Responsive</h3>
+                <p>Access your greenhouse data anytime, anywhere on any device.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📄</div>
+                <h3>Export Reports</h3>
+                <p>Generate and export detailed PDF reports for analysis and record-keeping.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Benefits Section -->
+    <section id="benefits" style="padding: 4rem 5%;">
+        <h2 style="text-align: center; color: white; font-size: 2.5rem; margin-bottom: 3rem;">Why Choose Us</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+            <div class="glass-card" style="text-align: center;">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">📈</div>
+                <h3 style="margin-bottom: 1rem;">Increase Yield</h3>
+                <p>Optimize growing conditions for maximum crop yield and quality.</p>
+            </div>
+            <div class="glass-card" style="text-align: center;">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">💧</div>
+                <h3 style="margin-bottom: 1rem;">Save Resources</h3>
+                <p>Reduce water and energy consumption through smart monitoring.</p>
+            </div>
+            <div class="glass-card" style="text-align: center;">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">🔔</div>
+                <h3 style="margin-bottom: 1rem;">Early Warning</h3>
+                <p>Detect issues early before they affect your crop health.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section style="padding: 4rem 5%; text-align: center;">
+        <div class="glass-card" style="max-width: 800px; margin: 0 auto;">
+            <h2 style="font-size: 2rem; margin-bottom: 1rem;">Ready to Transform Your Greenhouse?</h2>
+            <p style="margin-bottom: 2rem; opacity: 0.9;">Start monitoring your greenhouse environment with our intelligent system today.</p>
+            <div style="display: flex; gap: 1rem; justify-content: center;">
+                <a href="{{ url_for('auth.login') }}" class="btn btn-primary">Login & Start Detection</a>
+                <!-- <a href="{{ url_for('detection.detect') }}" class="btn btn-primary">Start Detection</a> -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer style="background: rgba(0,0,0,0.3); padding: 2rem 5%; text-align: center; color: white;">
+        <p>&copy; 2026 Smart Greenhouse AI. All rights reserved.</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

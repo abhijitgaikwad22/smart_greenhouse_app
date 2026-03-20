@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>  Login - Smart Greenhouse</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <span class="logo-icon">🌿</span>
+            <span>GreenHouse AI</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="{{ url_for('auth.index') }}">Home</a></li>
+            
+        </ul>
+    </nav>
+
+    <div style="min-height: 80vh; display: flex; align-items: center; justify-content: center; padding: 2rem;">
+        <div class="glass-card" style="max-width: 400px; width: 100%;">
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <div style="font-size: 3rem;">🔐</div>
+                <h2 style="margin-top: 1rem;">Admin Login</h2>
+                <p style="opacity: 0.7;">Enter your credentials to access the dashboard</p>
+            </div>
+
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST" action="{{ url_for('auth.login') }}">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" class="form-control" required placeholder="Enter username">
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" class="form-control" required placeholder="Enter password">
+                </div>
+
+                <div style="margin: 1rem 0; padding: 1rem; background: rgba(52, 152, 219, 0.1); border-radius: 10px;">
+                    <p style="font-size: 0.9rem; text-align: center;">
+                        <strong>Demo Credentials:</strong><br>
+                        Username: admin<br>
+                        Password: admin123
+                    </p>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
+            </form>
+
+            <div style="text-align: center; margin-top: 1rem;">
+                <a href="{{ url_for('auth.index') }}" style="color: white; opacity: 0.7; text-decoration: none;">← Back to Home</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

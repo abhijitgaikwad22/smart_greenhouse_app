@@ -1,0 +1,4 @@
+Timestamp,Crop,Temperature,Humidity,Soil_Moisture,Light,Status,Score
+2026-02-22 10:47:39,Okra,40.0,90.0,30.0,80.0,CRITICAL,25
+2026-02-22 22:10:51,Tomato,19.0,70.0,50.0,60.0,GOOD,100
+2026-02-27 17:35:52,Tomato,42.0,57.0,80.0,68.0,ATTENTION REQUIRED,50

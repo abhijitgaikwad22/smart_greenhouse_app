@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Environment Detection - Smart Greenhouse</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari&display=swap" rel="stylesheet">
+    <style>
+        .marathi-text {
+            font-family: 'Noto Sans Devanagari', sans-serif;
+        }
+        .crop-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 5px;
+            font-size: 0.75rem;
+            background: rgba(52, 152, 219, 0.2);
+            color: #3498db;
+        }
+        .region-tag {
+            font-size: 0.8rem;
+            color: #f39c12;
+        }
+        .crop-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 0.5rem;
+        }
+        .crop-item {
+            padding: 0.75rem;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .crop-item:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateY(-2px);
+        }
+        .crop-item.selected {
+            background: rgba(46, 204, 113, 0.2);
+            border: 1px solid #2ecc71;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <span class="logo-icon">🌿</span>
+            <span>GreenHouse AI</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="{{ url_for('auth.index') }}">Home</a></li>
+            
+            <li><a href="{{ url_for('crop_comparison') }}">Comparison</a></li>
+            <li><a href="{{ url_for('crop_recommendation') }}">AI Recommend</a></li>
+            <li><a href="{{ url_for('fertilizer_guide') }}">Fertilizer Guide</a></li>
+            <li><a href="{{ url_for('dashboard.dashboard') }}">Dashboard</a></li>
+            <li><a href="{{ url_for('detection.detect') }} "class="active">Detection</a></li>
+            <li><a href="{{ url_for('auth.logout') }}" class="btn-login">Logout</a></li>
+        </ul>
+    </nav>
+
+    <div style="max-width: 1400px; margin: 2rem auto; padding: 0 1rem;">
+        <h1 style="color: white; text-align: center; margin-bottom: 2rem;">🌱 Environment Detection - महाराष्ट्र पिके</h1>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+            <!-- Input Form -->
+            <div class="glass-card">
+                <h2 style="margin-bottom: 1.5rem;">Input Parameters / मापदंड</h2>
+                <form id="detectionForm" method="POST" action="{{ url_for('detection.detect') }}">
+                    <div class="form-group">
+                        <label for="crop">Crop Type / पिकाचा प्रकार</label>
+                        <select id="crop" name="crop" class="form-control" required>
+                            <option value="">Select Crop / पीक निवडा</option>
+                            <option value="Tomato" {% if form_data and form_data.crop == 'Tomato' %}selected{% endif %}>🍅 Tomato (टोमॅटो) - Nashik, Pune</option>
+                            <option value="Lettuce" {% if form_data and form_data.crop == 'Lettuce' %}selected{% endif %}>🥬 Lettuce (लेट्यूस) - Mahabaleshwar</option>
+                            <option value="Capsicum" {% if form_data and form_data.crop == 'Capsicum' %}selected{% endif %}>🌶️ Capsicum (ढोबळी मिरची) - Nashik</option>
+                            <option value="Brinjal" {% if form_data and form_data.crop == 'Brinjal' %}selected{% endif %}>🍆 Brinjal (वांगी) - Kolhapur</option>
+                            <option value="Okra" {% if form_data and form_data.crop == 'Okra' %}selected{% endif %}>🌱 Okra (भेंडी) - Ahmednagar</option>
+                            <option value="Cauliflower" {% if form_data and form_data.crop == 'Cauliflower' %}selected{% endif %}>🥦 Cauliflower (फ्लॉवर) - Pune</option>
+                            <option value="Cabbage" {% if form_data and form_data.crop == 'Cabbage' %}selected{% endif %}>🥬 Cabbage (कोबी) - Satara</option>
+                            <option value="Sugarcane" {% if form_data and form_data.crop == 'Sugarcane' %}selected{% endif %}>🎋 Sugarcane (ऊस) - Kolhapur, Sangli</option>
+                            <option value="Soybean" {% if form_data and form_data.crop == 'Soybean' %}selected{% endif %}>🌱 Soybean (सोयाबीन) - Latur, Nanded</option>
+                            <option value="Cotton" {% if form_data and form_data.crop == 'Cotton' %}selected{% endif %}>🌿 Cotton (कापूस) - Yavatmal, Akola</option>
+                            <option value="Groundnut" {% if form_data and form_data.crop == 'Groundnut' %}selected{% endif %}>🥜 Groundnut (भुईमूग) - Solapur</option>
+                            <option value="Bajra" {% if form_data and form_data.crop == 'Bajra' %}selected{% endif %}>🌾 Bajra (बाजरी) - Solapur, Dhule</option>
+                            <option value="Jowar" {% if form_data and form_data.crop == 'Jowar' %}selected{% endif %}>🌾 Jowar (ज्वारी) - Solapur, Pune</option>
+                            <option value="Wheat" {% if form_data and form_data.crop == 'Wheat' %}selected{% endif %}>🌾 Wheat (गहू) - Nashik, Ahmednagar</option>
+                            <option value="Tur" {% if form_data and form_data.crop == 'Tur' %}selected{% endif %}>🌱 Tur (तूर) - Latur, Nanded</option>
+                            <option value="Moong" {% if form_data and form_data.crop == 'Moong' %}selected{% endif %}>🌱 Moong (मूग) - Jalgaon, Dhule</option>
+                            <option value="Grapes" {% if form_data and form_data.crop == 'Grapes' %}selected{% endif %}>🍇 Grapes (द्राक्षे) - Nashik, Sangli</option>
+                            <option value="Pomegranate" {% if form_data and form_data.crop == 'Pomegranate' %}selected{% endif %}>🍎 Pomegranate (डाळिंब) - Solapur</option>
+                            <option value="Banana" {% if form_data and form_data.crop == 'Banana' %}selected{% endif %}>🍌 Banana (केळी) - Jalgaon</option>
+                            <option value="Orange" {% if form_data and form_data.crop == 'Orange' %}selected{% endif %}>🍊 Orange (संत्रे) - Nagpur</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="temperature">Temperature (°C) / तापमान</label>
+                        <input type="number" id="temperature" name="temperature" class="form-control" 
+                               min="0" max="50" step="0.1" required 
+                               value="{{ form_data.temperature if form_data else '' }}">
+                        <small style="opacity: 0.7;">Range: 0°C to 50°C</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="humidity">Humidity (%) / आर्द्रता</label>
+                        <input type="number" id="humidity" name="humidity" class="form-control" 
+                               min="0" max="100" step="0.1" required
+                               value="{{ form_data.humidity if form_data else '' }}">
+                        <small style="opacity: 0.7;">Range: 0% to 100%</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="soil_moisture">Soil Moisture (%) / जमिनीतील ओलावा</label>
+                        <input type="number" id="soil_moisture" name="soil_moisture" class="form-control" 
+                               min="0" max="100" step="0.1" required
+                               value="{{ form_data.soil_moisture if form_data else '' }}">
+                        <small style="opacity: 0.7;">Range: 0% to 100%</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="light">Light Intensity (%) / प्रकाश तीव्रता</label>
+                        <input type="number" id="light" name="light" class="form-control" 
+                               min="0" max="100" step="0.1" required
+                               value="{{ form_data.light if form_data else '' }}">
+                        <small style="opacity: 0.7;">Range: 0% to 100%</small>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Analyze Environment / विश्लेषण करा</button>
+                </form>
+            </div>
+
+            <!-- Results -->
+            <div class="glass-card">
+                <h2 style="margin-bottom: 1.5rem;">Analysis Results / विश्लेषण निकाल</h2>
+                
+                {% if result %}
+                    <!-- Status Badge -->
+                    <div style="text-align: center; margin-bottom: 2rem;">
+                        <div class="status-badge 
+                            {% if result.status == 'GOOD' %}good
+                            {% elif result.status == 'ATTENTION REQUIRED' %}attention
+                            {% else %}critical{% endif %}">
+                            {{ result.status }}
+                        </div>
+                        <div style="font-size: 3rem; margin: 1rem 0;">{{ result.score }}%</div>
+                        <div class="health-indicator">{{ result.health_indicator }}</div>
+                    </div>
+
+                    <!-- English Alerts -->
+                    <div style="margin-bottom: 1.5rem;">
+                        <h3 style="margin-bottom: 1rem;">⚠️ Alerts</h3>
+                        {% for alert in result.alerts %}
+                            <div class="alert-item" style="padding: 0.5rem; margin-bottom: 0.5rem; background: rgba(0,0,0,0.05); border-radius: 5px;">
+                                {{ alert }}
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- English Recommendations -->
+                    <div style="margin-bottom: 1.5rem;">
+                        <h3 style="margin-bottom: 1rem;">💡 Recommendations</h3>
+                        {% for rec in result.recommendations %}
+                            <div class="recommendation-item" style="padding: 0.5rem; margin-bottom: 0.5rem; background: rgba(46, 204, 113, 0.1); border-radius: 5px;">
+                                {{ rec }}
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Marathi Language Support -->
+                    {% if result and result.marathi_alerts %}
+                    <div style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1);">
+                        <h3 style="margin-bottom: 1rem; color: #f1c40f;">🇮🇳 मराठी माहिती / Marathi Information</h3>
+                        
+                        <!-- Marathi Alerts -->
+                        <div style="margin-bottom: 1.5rem;">
+                            <h4 style="margin-bottom: 0.5rem;">⚠️ सूचना / Alerts</h4>
+                            {% for alert in result.marathi_alerts %}
+                            <div class="alert-item" style="padding: 0.5rem; margin-bottom: 0.5rem; background: rgba(241, 196, 15, 0.1); border-radius: 5px; font-family: 'Noto Sans Devanagari', sans-serif;">
+                                {{ alert }}
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <!-- Marathi Recommendations -->
+                        <div style="margin-bottom: 1.5rem;">
+                            <h4 style="margin-bottom: 0.5rem;">💡 सूचना / Recommendations</h4>
+                            {% for rec in result.marathi_recommendations %}
+                            <div class="recommendation-item" style="padding: 0.5rem; margin-bottom: 0.5rem; background: rgba(46, 204, 113, 0.1); border-radius: 5px; font-family: 'Noto Sans Devanagari', sans-serif;">
+                                {{ rec }}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Crop Regional Information -->
+                    {% if result and result.crop_info %}
+                    <div style="margin-top: 1rem; padding: 1rem; background: rgba(52, 152, 219, 0.1); border-radius: 10px;">
+                        <h4 style="margin-bottom: 0.5rem;">📍 Regional Information / प्रादेशिक माहिती</h4>
+                        <p><strong>Region / जिल्हा:</strong> {{ result.crop_info.region }}</p>
+                        <p><strong>Season / हंगाम:</strong> {{ result.crop_info.season }}</p>
+                        <p><strong>Soil Type / जमिनीचा प्रकार:</strong> {{ result.crop_info.soil_type }}</p>
+                        <p><strong>Local Tips / स्थानिक टिप्स:</strong> <span class="marathi-text">{{ result.crop_info.local_tips }}</span></p>
+                    </div>
+                    {% endif %}
+
+                    <!-- Export Buttons -->
+                    <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                        <button id="exportPdf" class="btn btn-secondary" style="flex: 1;">📄 Export PDF</button>
+                        <a href="{{ url_for('detection.export_csv') }}" class="btn btn-secondary" style="flex: 1; text-align: center;">📊 Export CSV</a>
+                    </div>
+                {% else %}
+                    <div style="text-align: center; padding: 3rem;">
+                        <div style="font-size: 4rem; margin-bottom: 1rem;">🔍</div>
+                        <p style="opacity: 0.7;">Enter environmental parameters and click Analyze to see results</p>
+                        <p style="opacity: 0.5; font-size: 0.9rem;">पर्यावरणीय मापदंड भरा आणि विश्लेषण करा</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Maharashtra Crop Information Section -->
+        <div style="margin-top: 2rem;">
+            <h2 style="color: white; text-align: center; margin-bottom: 1rem;">🌾 महाराष्ट्रातील प्रमुख पिके / Major Crops of Maharashtra</h2>
+            
+            <!-- Quick Filter Buttons -->
+            <div style="display: flex; gap: 0.5rem; justify-content: center; margin-bottom: 1rem; flex-wrap: wrap;">
+                <button class="btn btn-secondary" onclick="filterCrops('all')">सर्व / All</button>
+                <button class="btn btn-secondary" onclick="filterCrops('Kharif')">खरीप / Kharif</button>
+                <button class="btn btn-secondary" onclick="filterCrops('Rabi')">रब्बी / Rabi</button>
+                <button class="btn btn-secondary" onclick="filterCrops('Vegetable')">भाजीपाला / Vegetables</button>
+                <button class="btn btn-secondary" onclick="filterCrops('Fruit')">फळे / Fruits</button>
+                <button class="btn btn-secondary" onclick="filterCrops('Western')">पश्चिम / Western</button>
+                <button class="btn btn-secondary" onclick="filterCrops('Vidarbha')">विदर्भ / Vidarbha</button>
+                <button class="btn btn-secondary" onclick="filterCrops('Marathwada')">मराठवाडा / Marathwada</button>
+            </div>
+
+            <!-- Crop Grid -->
+            <div class="crop-grid" id="cropGrid">
+                <!-- Tomato -->
+                <div class="crop-item" data-season="Kharif Rabi" data-type="Vegetable" data-region="Western" onclick="selectCrop('Tomato')">
+                    <strong>🍅 Tomato (टोमॅटो)</strong>
+                    <div class="region-tag">Nashik, Pune, Satara</div>
+                    <div>18-30°C | 60-80% | >40% | 50-90%</div>
+                    <span class="crop-badge">खरीप & रब्बी</span>
+                </div>
+                
+                <!-- Lettuce -->
+                <div class="crop-item" data-season="Rabi" data-type="Vegetable" data-region="Western" onclick="selectCrop('Lettuce')">
+                    <strong>🥬 Lettuce (लेट्यूस)</strong>
+                    <div class="region-tag">Pune, Mahabaleshwar</div>
+                    <div>10-24°C | 65-85% | >50% | 40-70%</div>
+                    <span class="crop-badge">रब्बी</span>
+                </div>
+                
+                <!-- Capsicum -->
+                <div class="crop-item" data-season="Kharif Rabi" data-type="Vegetable" data-region="Western" onclick="selectCrop('Capsicum')">
+                    <strong>🌶️ Capsicum (ढोबळी मिरची)</strong>
+                    <div class="region-tag">Nashik, Pune, Satara</div>
+                    <div>16-28°C | 50-75% | >45% | 50-85%</div>
+                    <span class="crop-badge">खरीप & रब्बी</span>
+                </div>
+                
+                <!-- Brinjal -->
+                <div class="crop-item" data-season="Annual" data-type="Vegetable" data-region="Western" onclick="selectCrop('Brinjal')">
+                    <strong>🍆 Brinjal (वांगी)</strong>
+                    <div class="region-tag">Kolhapur, Pune, Ahmednagar</div>
+                    <div>20-32°C | 55-75% | >45% | 60-90%</div>
+                    <span class="crop-badge">वार्षिक</span>
+                </div>
+                
+                <!-- Okra -->
+                <div class="crop-item" data-season="Kharif" data-type="Vegetable" data-region="Marathwada" onclick="selectCrop('Okra')">
+                    <strong>🌱 Okra (भेंडी)</strong>
+                    <div class="region-tag">Ahmednagar, Jalna, Parbhani</div>
+                    <div>22-35°C | 50-70% | >40% | 70-100%</div>
+                    <span class="crop-badge">खरीप</span>
+                </div>
+                
+                <!-- Cauliflower -->
+                <div class="crop-item" data-season="Rabi" data-type="Vegetable" data-region="Western" onclick="selectCrop('Cauliflower')">
+                    <strong>🥦 Cauliflower (फ्लॉवर)</strong>
+                    <div class="region-tag">Pune, Nasik, Satara</div>
+                    <div>15-25°C | 60-80% | >50% | 50-80%</div>
+                    <span class="crop-badge">रब्बी</span>
+                </div>
+                
+                <!-- Cabbage -->
+                <div class="crop-item" data-season="Rabi" data-type="Vegetable" data-region="Western" onclick="selectCrop('Cabbage')">
+                    <strong>🥬 Cabbage (कोबी)</strong>
+                    <div class="region-tag">Pune, Satara, Kolhapur</div>
+                    <div>12-26°C | 60-80% | >50% | 45-75%</div>
+                    <span class="crop-badge">रब्बी</span>
+                </div>
+                
+                <!-- Sugarcane -->
+                <div class="crop-item" data-season="Annual" data-type="Cash" data-region="Western" onclick="selectCrop('Sugarcane')">
+                    <strong>🎋 Sugarcane (ऊस)</strong>
+                    <div class="region-tag">Kolhapur, Sangli, Solapur</div>
+                    <div>20-35°C | 60-85% | >60% | 80-100%</div>
+                    <span class="crop-badge">वार्षिक</span>
+                </div>
+                
+                <!-- Soybean -->
+                <div class="crop-item" data-season="Kharif" data-type="Oilseed" data-region="Marathwada" onclick="selectCrop('Soybean')">
+                    <strong>🌱 Soybean (सोयाबीन)</strong>
+                    <div class="region-tag">Latur, Nanded, Parbhani</div>
+                    <div>20-32°C | 50-75% | >40% | 60-90%</div>
+                    <span class="crop-badge">खरीप</span>
+                </div>
+                
+                <!-- Cotton -->
+                <div class="crop-item" data-season="Kharif" data-type="Cash" data-region="Vidarbha" onclick="selectCrop('Cotton')">
+                    <strong>🌿 Cotton (कापूस)</strong>
+                    <div class="region-tag">Yavatmal, Akola, Amravati</div>
+                    <div>22-36°C | 40-65% | >35% | 70-100%</div>
+                    <span class="crop-badge">खरीप</span>
+                </div>
+                
+                <!-- Groundnut -->
+                <div class="crop-item" data-season="Kharif" data-type="Oilseed" data-region="Western" onclick="selectCrop('Groundnut')">
+                    <strong>🥜 Groundnut (भुईमूग)</strong>
+                    <div class="region-tag">Solapur, Ahmednagar, Nashik</div>
+                    <div>22-34°C | 45-70% | >35% | 75-100%</div>
+                    <span class="crop-badge">खरीप</span>
+                </div>
+                
+                <!-- Bajra -->
+                <div class="crop-item" data-season="Kharif" data-type="Cereal" data-region="Western" onclick="selectCrop('Bajra')">
+                    <strong>🌾 Bajra (बाजरी)</strong>
+                    <div class="region-tag">Solapur, Ahmednagar, Dhule</div>
+                    <div>25-38°C | 35-60% | >25% | 80-100%</div>
+                    <span class="crop-badge">खरीप</span>
+                </div>
+                
+                <!-- Jowar -->
+                <div class="crop-item" data-season="Kharif Rabi" data-type="Cereal" data-region="Western" onclick="selectCrop('Jowar')">
+                    <strong>🌾 Jowar (ज्वारी)</strong>
+                    <div class="region-tag">Solapur, Pune, Satara, Sangli</div>
+                    <div>20-35°C | 40-65% | >30% | 70-100%</div>
+                    <span class="crop-badge">खरीप & रब्बी</span>
+                </div>
+                
+                <!-- Wheat -->
+                <div class="crop-item" data-season="Rabi" data-type="Cereal" data-region="Western" onclick="selectCrop('Wheat')">
+                    <strong>🌾 Wheat (गहू)</strong>
+                    <div class="region-tag">Nashik, Ahmednagar, Pune</div>
+                    <div>12-25°C | 40-65% | >45% | 60-90%</div>
+                    <span class="crop-badge">रब्बी</span>
+                </div>
+                
+                <!-- Tur -->
+                <div class="crop-item" data-season="Kharif" data-type="Pulse" data-region="Marathwada" onclick="selectCrop('Tur')">
+                    <strong>🌱 Tur (तूर)</strong>
+                    <div class="region-tag">Latur, Nanded, Parbhani, Jalna</div>
+                    <div>20-34°C | 45-70% | >30% | 70-100%</div>
+                    <span class="crop-badge">खरीप</span>
+                </div>
+                
+                <!-- Moong -->
+                <div class="crop-item" data-season="Kharif" data-type="Pulse" data-region="Western" onclick="selectCrop('Moong')">
+                    <strong>🌱 Moong (मूग)</strong>
+                    <div class="region-tag">Jalgaon, Dhule, Nashik</div>
+                    <div>20-32°C | 50-75% | >35% | 65-95%</div>
+                    <span class="crop-badge">खरीप</span>
+                </div>
+                
+                <!-- Grapes -->
+                <div class="crop-item" data-season="Rabi" data-type="Fruit" data-region="Western" onclick="selectCrop('Grapes')">
+                    <strong>🍇 Grapes (द्राक्षे)</strong>
+                    <div class="region-tag">Nashik, Sangli, Solapur</div>
+                    <div>15-35°C | 45-65% | >50% | 70-100%</div>
+                    <span class="crop-badge">रब्बी</span>
+                </div>
+                
+                <!-- Pomegranate -->
+                <div class="crop-item" data-season="Annual" data-type="Fruit" data-region="Western" onclick="selectCrop('Pomegranate')">
+                    <strong>🍎 Pomegranate (डाळिंब)</strong>
+                    <div class="region-tag">Solapur, Sangli, Ahmednagar</div>
+                    <div>15-38°C | 35-55% | >40% | 80-100%</div>
+                    <span class="crop-badge">वार्षिक</span>
+                </div>
+                
+                <!-- Banana -->
+                <div class="crop-item" data-season="Annual" data-type="Fruit" data-region="Western" onclick="selectCrop('Banana')">
+                    <strong>🍌 Banana (केळी)</strong>
+                    <div class="region-tag">Jalgaon, Dhule, Nandurbar</div>
+                    <div>20-35°C | 60-85% | >55% | 70-100%</div>
+                    <span class="crop-badge">वार्षिक</span>
+                </div>
+                
+                <!-- Orange -->
+                <div class="crop-item" data-season="Rabi" data-type="Fruit" data-region="Vidarbha" onclick="selectCrop('Orange')">
+                    <strong>🍊 Orange (संत्रे)</strong>
+                    <div class="region-tag">Nagpur, Amravati, Wardha</div>
+                    <div>10-35°C | 40-70% | >45% | 70-95%</div>
+                    <span class="crop-badge">रब्बी</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script>
+        // Function to select crop from grid
+        function selectCrop(cropName) {
+            const select = document.getElementById('crop');
+            for(let option of select.options) {
+                if(option.value === cropName) {
+                    option.selected = true;
+                    // Highlight selected crop in grid
+                    document.querySelectorAll('.crop-item').forEach(item => {
+                        item.classList.remove('selected');
+                    });
+                    event.currentTarget.classList.add('selected');
+                    break;
+                }
+            }
+        }
+
+        // Function to filter crops
+        function filterCrops(filter) {
+            const items = document.querySelectorAll('.crop-item');
+            items.forEach(item => {
+                if(filter === 'all') {
+                    item.style.display = 'block';
+                } else if(filter === 'Vegetable' || filter === 'Fruit' || filter === 'Cereal' || filter === 'Pulse' || filter === 'Oilseed' || filter === 'Cash') {
+                    if(item.dataset.type === filter) {
+                        item.style.display = 'block';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                } else if(filter === 'Kharif' || filter === 'Rabi' || filter === 'Annual') {
+                    if(item.dataset.season.includes(filter)) {
+                        item.style.display = 'block';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                } else {
+                    if(item.dataset.region === filter) {
+                        item.style.display = 'block';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                }
+            });
+        }
+
+        // Auto-select crop if form data exists
+        {% if form_data and form_data.crop %}
+        window.onload = function() {
+            const selectedCrop = '{{ form_data.crop }}';
+            document.querySelectorAll('.crop-item').forEach(item => {
+                if(item.innerHTML.includes(selectedCrop)) {
+                    item.classList.add('selected');
+                }
+            });
+        }
+        {% endif %}
+    </script>
+</body>
+</html>

@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Crop Recommendation - Smart Greenhouse</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Syne:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ===== MODERN STRUCTURE ===== */
+        :root {
+            --card-glow: 0 0 30px rgba(0, 212, 79, 0.15);
+            --card-glow-hover: 0 0 50px rgba(0, 212, 79, 0.3);
+            --transition-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        /* Hero Section */
+        .hero-recommend {
+            text-align: center;
+            margin-bottom: var(--space-16);
+            position: relative;
+            padding: var(--space-8) 0;
+        }
+
+        .hero-recommend::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(0, 212, 79, 0.08) 0%, transparent 70%);
+            pointer-events: none;
+            animation: pulse-glow 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); }
+            50% { opacity: 0.8; transform: translate(-50%, -50%) scale(1.1); }
+        }
+
+        .ai-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+            background: rgba(0, 212, 79, 0.1);
+            border: 1px solid rgba(0, 212, 79, 0.3);
+            backdrop-filter: blur(10px);
+            padding: var(--space-2) var(--space-5);
+            border-radius: var(--radius-full);
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--green-400);
+            margin-bottom: var(--space-6);
+            position: relative;
+            z-index: 2;
+            animation: float-badge 3s ease-in-out infinite;
+        }
+
+        @keyframes float-badge {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .ai-badge i {
+            font-style: normal;
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+
+        .title-gradient {
+            font-size: clamp(3rem, 8vw, 5.5rem);
+            font-weight: 900;
+            line-height: 1;
+            background: linear-gradient(135deg, #fff 0%, var(--green-400) 50%, #fff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: var(--space-4);
+            position: relative;
+            z-index: 2;
+            animation: title-reveal 1s var(--transition-bounce);
+        }
+
+        @keyframes title-reveal {
+            0% { opacity: 0; transform: translateY(30px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+            animation: fadeIn 0.8s ease 0.2s both;
+        }
+
+        /* Input Panel */
+        .input-panel-modern {
+            background: rgba(24, 43, 27, 0.7);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-2xl);
+            padding: var(--space-10);
+            border: 1px solid rgba(0, 212, 79, 0.15);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.05);
+            margin-bottom: var(--space-10);
+            position: relative;
+            z-index: 2;
+            animation: slideUp 0.8s ease 0.3s both;
+        }
+
+        @keyframes slideUp {
+            0% { opacity: 0; transform: translateY(30px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .input-grid-modern {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-6);
+            margin-bottom: var(--space-8);
+        }
+
+        .input-card-modern {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: var(--radius-xl);
+            padding: var(--space-8) var(--space-6);
+            text-align: center;
+            border: 1px solid rgba(0, 212, 79, 0.1);
+            transition: all 0.4s var(--transition-bounce);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(5px);
+        }
+
+        .input-card-modern::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--green-400), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+
+        .input-card-modern::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 50% 0%, rgba(0, 212, 79, 0.15), transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .input-card-modern:hover {
+            transform: translateY(-10px) scale(1.02);
+            border-color: rgba(0, 212, 79, 0.3);
+            box-shadow: var(--card-glow-hover);
+        }
+
+        .input-card-modern:hover::before {
+            transform: translateX(100%);
+        }
+
+        .input-card-modern:hover::after {
+            opacity: 1;
+        }
+
+        .input-icon-modern {
+            font-size: 3.5rem;
+            margin-bottom: var(--space-4);
+            position: relative;
+            z-index: 2;
+            animation: icon-float 3s ease-in-out infinite;
+        }
+
+        @keyframes icon-float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .input-card-modern:nth-child(1) .input-icon-modern { animation-delay: 0s; }
+        .input-card-modern:nth-child(2) .input-icon-modern { animation-delay: 0.2s; }
+        .input-card-modern:nth-child(3) .input-icon-modern { animation-delay: 0.4s; }
+
+        .input-label-modern {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            font-weight: 600;
+            margin-bottom: var(--space-3);
+            position: relative;
+            z-index: 2;
+        }
+
+        .input-value-modern {
+            font-family: var(--font-display);
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--green-400);
+            margin: var(--space-3) 0;
+            position: relative;
+            z-index: 2;
+            text-shadow: 0 0 20px rgba(0, 212, 79, 0.5);
+        }
+
+        .slider-modern {
+            width: 100%;
+            height: 8px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: var(--radius-full);
+            outline: none;
+            -webkit-appearance: none;
+            position: relative;
+            z-index: 2;
+        }
+
+        .slider-modern::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--green-400), var(--green-600));
+            cursor: pointer;
+            box-shadow: 0 0 30px var(--green-400);
+            transition: all 0.3s var(--transition-bounce);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .slider-modern::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 40px var(--green-400);
+        }
+
+        .range-labels-modern {
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            margin-top: var(--space-3);
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Action Button */
+        .action-button {
+            background: linear-gradient(135deg, var(--green-500), var(--green-700));
+            border: none;
+            color: white;
+            font-size: 1.3rem;
+            font-weight: 700;
+            padding: var(--space-5) var(--space-10);
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.4s var(--transition-bounce);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .action-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.8s, height 0.8s;
+        }
+
+        .action-button:hover::before {
+            width: 500px;
+            height: 500px;
+        }
+
+        .action-button:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 0 50px rgba(0, 212, 79, 0.5);
+        }
+
+        .action-button:active {
+            transform: translateY(-2px);
+        }
+
+        /* Result Panel */
+        .result-panel-modern {
+            background: rgba(24, 43, 27, 0.8);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-2xl);
+            padding: var(--space-10);
+            border: 1px solid rgba(0, 212, 79, 0.15);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            margin-top: var(--space-8);
+            display: none;
+            animation: resultReveal 0.6s var(--transition-bounce);
+        }
+
+        @keyframes resultReveal {
+            0% { opacity: 0; transform: scale(0.95) translateY(20px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .result-panel-modern.show {
+            display: block;
+        }
+
+        /* AI Thinking Animation */
+        .thinking-container {
+            text-align: center;
+            padding: var(--space-12);
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: var(--radius-xl);
+            border: 1px solid rgba(0, 212, 79, 0.1);
+        }
+
+        .thinking-text {
+            color: var(--text-secondary);
+            font-size: 1.3rem;
+            margin-bottom: var(--space-6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-3);
+        }
+
+        .thinking-dots-modern {
+            display: flex;
+            gap: 0.8rem;
+            justify-content: center;
+        }
+
+        .thinking-dots-modern span {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: var(--gradient-green);
+            animation: thinkingModern 1.4s infinite;
+        }
+
+        @keyframes thinkingModern {
+            0%, 60%, 100% { transform: scale(1); opacity: 0.3; }
+            30% { transform: scale(1.5); opacity: 1; }
+        }
+
+        .thinking-dots-modern span:nth-child(2) { animation-delay: 0.2s; }
+        .thinking-dots-modern span:nth-child(3) { animation-delay: 0.4s; }
+        .thinking-dots-modern span:nth-child(4) { animation-delay: 0.6s; }
+        .thinking-dots-modern span:nth-child(5) { animation-delay: 0.8s; }
+
+        .processing-bar {
+            width: 300px;
+            height: 4px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: var(--radius-full);
+            margin: var(--space-6) auto 0;
+            overflow: hidden;
+        }
+
+        .processing-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--green-400), var(--green-600), var(--green-400));
+            animation: processing 5s linear forwards;
+        }
+
+        @keyframes processing {
+            0% { width: 0%; }
+            20% { width: 20%; }
+            40% { width: 40%; }
+            60% { width: 60%; }
+            80% { width: 80%; }
+            100% { width: 100%; }
+        }
+
+        /* Winner Card */
+        .winner-card-modern {
+            background: linear-gradient(145deg, rgba(0, 212, 79, 0.1), rgba(0, 0, 0, 0.3));
+            border-radius: var(--radius-2xl);
+            padding: var(--space-10);
+            text-align: center;
+            border: 1px solid rgba(0, 212, 79, 0.3);
+            position: relative;
+            overflow: hidden;
+            margin-bottom: var(--space-8);
+        }
+
+        .winner-card-modern::before {
+            content: '🌱';
+            position: absolute;
+            right: -30px;
+            bottom: -30px;
+            font-size: 200px;
+            opacity: 0.05;
+            transform: rotate(-15deg);
+            animation: rotateSlow 20s linear infinite;
+        }
+
+        @keyframes rotateSlow {
+            from { transform: rotate(-15deg); }
+            to { transform: rotate(345deg); }
+        }
+
+        .winner-icon-modern {
+            font-size: 7rem;
+            margin-bottom: var(--space-4);
+            animation: winnerBounce 3s var(--transition-bounce) infinite;
+        }
+
+        @keyframes winnerBounce {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-20px) scale(1.1); }
+        }
+
+        .winner-name-modern {
+            font-family: var(--font-display);
+            font-size: 4rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #fff, var(--green-400), #fff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: var(--space-2);
+            text-transform: uppercase;
+        }
+
+        .winner-marathi-modern {
+            font-family: var(--font-marathi);
+            font-size: 2rem;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-6);
+        }
+
+        /* Stats Grid Modern */
+        .stats-grid-modern {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-4);
+            margin: var(--space-8) 0;
+        }
+
+        .stat-item-modern {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: var(--radius-lg);
+            padding: var(--space-5);
+            text-align: center;
+            border: 1px solid rgba(0, 212, 79, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .stat-item-modern:hover {
+            transform: translateY(-5px);
+            border-color: rgba(0, 212, 79, 0.3);
+            box-shadow: var(--card-glow);
+        }
+
+        .stat-label-modern {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: var(--space-2);
+        }
+
+        .stat-value-modern {
+            font-family: var(--font-display);
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--green-400);
+            line-height: 1.2;
+        }
+
+        .stat-text-modern {
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        /* Confidence Meter Modern */
+        .confidence-section-modern {
+            margin: var(--space-8) 0;
+            padding: var(--space-6);
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: var(--radius-xl);
+        }
+
+        .confidence-header-modern {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-3);
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .confidence-percent {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--green-400);
+        }
+
+        .meter-modern {
+            width: 100%;
+            height: 12px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: var(--radius-full);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .meter-fill-modern {
+            height: 100%;
+            background: linear-gradient(90deg, var(--green-400), var(--green-600));
+            border-radius: var(--radius-full);
+            transition: width 1.5s var(--transition-bounce);
+            position: relative;
+            animation: meterPulse 2s infinite;
+        }
+
+        @keyframes meterPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        /* Match Badge Modern */
+        .match-badge-modern {
+            background: rgba(0, 212, 79, 0.1);
+            border: 1px solid rgba(0, 212, 79, 0.3);
+            border-radius: var(--radius-xl);
+            padding: var(--space-5) var(--space-6);
+            margin: var(--space-6) 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: var(--space-4);
+            animation: glowPulse 2s infinite;
+        }
+
+        @keyframes glowPulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(0, 212, 79, 0.2); }
+            50% { box-shadow: 0 0 40px rgba(0, 212, 79, 0.4); }
+        }
+
+        .badge-ai-modern {
+            background: linear-gradient(135deg, var(--amber-500), var(--amber-600));
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: var(--radius-full);
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        /* Runner Up Section Modern */
+        .runner-section-modern {
+            margin-top: var(--space-8);
+        }
+
+        .runner-title-modern {
+            font-size: 1.5rem;
+            color: var(--text-white);
+            margin-bottom: var(--space-5);
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+        }
+
+        .runner-grid-modern {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-4);
+        }
+
+        .runner-card-modern {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: var(--radius-xl);
+            padding: var(--space-5);
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+            border: 1px solid rgba(0, 212, 79, 0.1);
+            transition: all 0.3s var(--transition-bounce);
+        }
+
+        .runner-card-modern:hover {
+            transform: translateY(-5px) scale(1.02);
+            border-color: rgba(0, 212, 79, 0.3);
+            box-shadow: var(--card-glow);
+        }
+
+        .runner-icon-modern {
+            font-size: 2.5rem;
+            animation: runnerFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes runnerFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .runner-info-modern {
+            flex: 1;
+        }
+
+        .runner-name-modern {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .runner-marathi-modern {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin: 0.2rem 0;
+        }
+
+        .runner-score-modern {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--green-400);
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .input-grid-modern {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid-modern {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .winner-name-modern {
+                font-size: 2.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid-modern {
+                grid-template-columns: 1fr;
+            }
+            
+            .runner-grid-modern {
+                grid-template-columns: 1fr;
+            }
+            
+            .input-panel-modern,
+            .result-panel-modern,
+            .winner-card-modern {
+                padding: var(--space-5);
+            }
+            
+            .winner-icon-modern {
+                font-size: 4rem;
+            }
+            
+            .winner-name-modern {
+                font-size: 2rem;
+            }
+            
+            .winner-marathi-modern {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <span class="logo-icon">🌿</span>
+            <span>GreenHouse AI</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="{{ url_for('auth.index') }}">Home</a></li>
+            
+            <li><a href="{{ url_for('detection.detect') }}">Detection</a></li>
+            <li><a href="{{ url_for('crop_comparison') }}">Comparison</a></li>
+            
+            <li><a href="{{ url_for('dashboard.dashboard') }}">Dashboard</a></li>
+            <li><a href="{{ url_for('fertilizer_guide') }}">Fertilizer Guide</a></li>
+            
+            <li><a href="{{ url_for('crop_recommendation') }}" class="active">AI Recommend</a></li>
+        </ul>
+    </nav>
+
+    <div class="section">
+        <!-- Hero Section -->
+        <div class="hero-recommend">
+            <div class="ai-badge">
+                <i>⚡</i>
+                <span>AI-POWERED RECOMMENDATION ENGINE</span>
+                <i>⚡</i>
+            </div>
+            <h1 class="title-gradient">
+                CROP RECOMMENDATION
+            </h1>
+            <p class="subtitle">
+                तुमच्या हवामानानुसार सर्वोत्तम पिकाचा AI सल्ला
+            </p>
+        </div>
+
+        <!-- Input Panel -->
+        <div class="input-panel-modern">
+            <div class="input-grid-modern">
+                <!-- Temperature -->
+                <div class="input-card-modern">
+                    <div class="input-icon-modern">🌡️</div>
+                    <div class="input-label-modern">Temperature</div>
+                    <div class="input-value-modern" id="tempDisplay">25°C</div>
+                    <input type="range" class="slider-modern" id="temperature" min="5" max="45" value="25" step="0.5" oninput="updateValues()">
+                    <div class="range-labels-modern">
+                        <span>5°C</span>
+                        <span>45°C</span>
+                    </div>
+                </div>
+
+                <!-- Humidity -->
+                <div class="input-card-modern">
+                    <div class="input-icon-modern">💧</div>
+                    <div class="input-label-modern">Humidity</div>
+                    <div class="input-value-modern" id="humidityDisplay">65%</div>
+                    <input type="range" class="slider-modern" id="humidity" min="20" max="95" value="65" step="1" oninput="updateValues()">
+                    <div class="range-labels-modern">
+                        <span>20%</span>
+                        <span>95%</span>
+                    </div>
+                </div>
+
+                <!-- Soil Moisture -->
+                <div class="input-card-modern">
+                    <div class="input-icon-modern">🌱</div>
+                    <div class="input-label-modern">Soil Moisture</div>
+                    <div class="input-value-modern" id="soilDisplay">55%</div>
+                    <input type="range" class="slider-modern" id="soil" min="20" max="95" value="55" step="1" oninput="updateValues()">
+                    <div class="range-labels-modern">
+                        <span>20%</span>
+                        <span>95%</span>
+                    </div>
+                </div>
+            </div>
+
+            <button class="action-button" onclick="getRecommendation()">
+                <span>🤖</span>
+                <span>ANALYZE & RECOMMEND</span>
+                <span>⚡</span>
+            </button>
+        </div>
+
+        <!-- Result Panel -->
+        <div class="result-panel-modern" id="resultPanel">
+            <!-- AI Thinking Animation -->
+            <div class="thinking-container" id="aiThinking">
+                <div class="thinking-text">
+                    <span>🤖</span>
+                    <span>AI is analyzing your conditions</span>
+                    <span>🧠</span>
+                </div>
+                <div class="thinking-dots-modern">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <div class="processing-bar">
+                    <div class="processing-fill"></div>
+                </div>
+                <div style="color: var(--text-muted); margin-top: var(--space-4);">
+                    Processing....
+                </div>
+            </div>
+
+            <!-- Recommendation Result -->
+            <div id="recommendationResult" style="display: none;">
+                <!-- Will be filled by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Crop database with ideal ranges
+        const crops = [
+            {
+                name: 'Tomato',
+                marathi: 'टोमॅटो',
+                icon: '🍅',
+                temp: { min: 18, max: 30 },
+                humidity: { min: 60, max: 80 },
+                soil: { min: 40, max: 100 },
+                region: 'नाशिक, पुणे, सातारा',
+                season: 'खरीप/रब्बी'
+            },
+            {
+                name: 'Lettuce',
+                marathi: 'लेट्यूस',
+                icon: '🥬',
+                temp: { min: 10, max: 24 },
+                humidity: { min: 65, max: 85 },
+                soil: { min: 50, max: 100 },
+                region: 'पुणे, महाबळेश्वर',
+                season: 'रब्बी'
+            },
+            {
+                name: 'Capsicum',
+                marathi: 'ढोबळी मिरची',
+                icon: '🌶️',
+                temp: { min: 16, max: 28 },
+                humidity: { min: 50, max: 75 },
+                soil: { min: 45, max: 100 },
+                region: 'नाशिक, पुणे, सातारा',
+                season: 'खरीप/रब्बी'
+            },
+            {
+                name: 'Grapes',
+                marathi: 'द्राक्षे',
+                icon: '🍇',
+                temp: { min: 15, max: 35 },
+                humidity: { min: 45, max: 65 },
+                soil: { min: 50, max: 100 },
+                region: 'नाशिक, सांगली, सोलापूर',
+                season: 'रब्बी'
+            },
+            {
+                name: 'Pomegranate',
+                marathi: 'डाळिंब',
+                icon: '🍎',
+                temp: { min: 15, max: 38 },
+                humidity: { min: 35, max: 55 },
+                soil: { min: 40, max: 75 },
+                region: 'सोलापूर, सांगली, नाशिक',
+                season: 'वार्षिक'
+            },
+            {
+                name: 'Orange',
+                marathi: 'संत्रे',
+                icon: '🍊',
+                temp: { min: 10, max: 35 },
+                humidity: { min: 40, max: 70 },
+                soil: { min: 45, max: 85 },
+                region: 'नागपूर, अमरावती, वर्धा',
+                season: 'रब्बी'
+            },
+            {
+                name: 'Cotton',
+                marathi: 'कापूस',
+                icon: '🌿',
+                temp: { min: 22, max: 36 },
+                humidity: { min: 40, max: 65 },
+                soil: { min: 35, max: 80 },
+                region: 'यवतमाळ, अकोला, अमरावती',
+                season: 'खरीप'
+            },
+            {
+                name: 'Sugarcane',
+                marathi: 'ऊस',
+                icon: '🎋',
+                temp: { min: 20, max: 35 },
+                humidity: { min: 60, max: 85 },
+                soil: { min: 60, max: 100 },
+                region: 'कोल्हापूर, सांगली, सोलापूर',
+                season: 'वार्षिक'
+            },
+            {
+                name: 'Brinjal',
+                marathi: 'वांगी',
+                icon: '🍆',
+                temp: { min: 20, max: 32 },
+                humidity: { min: 55, max: 75 },
+                soil: { min: 45, max: 100 },
+                region: 'कोल्हापूर, पुणे, अहमदनगर',
+                season: 'वार्षिक'
+            },
+            {
+                name: 'Okra',
+                marathi: 'भेंडी',
+                icon: '🌱',
+                temp: { min: 22, max: 35 },
+                humidity: { min: 50, max: 70 },
+                soil: { min: 40, max: 100 },
+                region: 'अहमदनगर, जालना, परभणी',
+                season: 'खरीप'
+            }
+        ];
+
+        function updateValues() {
+            const temp = document.getElementById('temperature').value;
+            const humidity = document.getElementById('humidity').value;
+            const soil = document.getElementById('soil').value;
+            
+            document.getElementById('tempDisplay').textContent = temp + '°C';
+            document.getElementById('humidityDisplay').textContent = humidity + '%';
+            document.getElementById('soilDisplay').textContent = soil + '%';
+        }
+
+        function calculateScore(crop, temp, humidity, soil) {
+            let score = 0;
+            let matches = [];
+
+            // Temperature score (max 40)
+            if (temp >= crop.temp.min && temp <= crop.temp.max) {
+                score += 40;
+                matches.push('तापमान');
+            } else {
+                const tempDiff = Math.min(
+                    Math.abs(temp - crop.temp.min),
+                    Math.abs(temp - crop.temp.max)
+                );
+                score += Math.max(0, 40 - (tempDiff * 2));
+            }
+
+            // Humidity score (max 30)
+            if (humidity >= crop.humidity.min && humidity <= crop.humidity.max) {
+                score += 30;
+                matches.push('आर्द्रता');
+            } else {
+                const humDiff = Math.min(
+                    Math.abs(humidity - crop.humidity.min),
+                    Math.abs(humidity - crop.humidity.max)
+                );
+                score += Math.max(0, 30 - humDiff);
+            }
+
+            // Soil moisture score (max 30)
+            if (soil >= crop.soil.min && soil <= crop.soil.max) {
+                score += 30;
+                matches.push('जमिनीतील ओलावा');
+            } else {
+                const soilDiff = Math.min(
+                    Math.abs(soil - crop.soil.min),
+                    Math.abs(soil - crop.soil.max)
+                );
+                score += Math.max(0, 30 - soilDiff);
+            }
+
+            return {
+                score: Math.round(score),
+                matches: matches,
+                matchCount: matches.length
+            };
+        }
+
+        function getRecommendation() {
+            const temp = parseFloat(document.getElementById('temperature').value);
+            const humidity = parseFloat(document.getElementById('humidity').value);
+            const soil = parseFloat(document.getElementById('soil').value);
+
+            // Show result panel and thinking animation
+            document.getElementById('resultPanel').classList.add('show');
+            document.getElementById('aiThinking').style.display = 'block';
+            document.getElementById('recommendationResult').style.display = 'none';
+
+            // Calculate scores for all crops
+            const scores = crops.map(crop => {
+                const result = calculateScore(crop, temp, humidity, soil);
+                return {
+                    ...crop,
+                    ...result
+                };
+            });
+
+            // Sort by score
+            scores.sort((a, b) => b.score - a.score);
+
+            // 5 second delay for AI feel
+            setTimeout(() => {
+                document.getElementById('aiThinking').style.display = 'none';
+                document.getElementById('recommendationResult').style.display = 'block';
+                
+                const winner = scores[0];
+                const runnerUp = scores[1];
+                const thirdPlace = scores[2];
+
+                let resultHTML = `
+                    <div class="winner-card-modern">
+                        <div class="winner-icon-modern">${winner.icon}</div>
+                        <div class="winner-name-modern">${winner.name}</div>
+                        <div class="winner-marathi-modern">${winner.marathi}</div>
+                        
+                        <div class="confidence-section-modern">
+                            <div class="confidence-header-modern">
+                                <span>AI Confidence Score</span>
+                                <span class="confidence-percent">${winner.score}%</span>
+                            </div>
+                            <div class="meter-modern">
+                                <div class="meter-fill-modern" style="width: ${winner.score}%;"></div>
+                            </div>
+                        </div>
+
+                        <div class="stats-grid-modern">
+                            <div class="stat-item-modern">
+                                <div class="stat-label-modern">Temperature</div>
+                                <div class="stat-value-modern">${winner.temp.min}-${winner.temp.max}°C</div>
+                            </div>
+                            <div class="stat-item-modern">
+                                <div class="stat-label-modern">Humidity</div>
+                                <div class="stat-value-modern">${winner.humidity.min}-${winner.humidity.max}%</div>
+                            </div>
+                            <div class="stat-item-modern">
+                                <div class="stat-label-modern">Soil Moisture</div>
+                                <div class="stat-value-modern">${winner.soil.min}%+</div>
+                            </div>
+                            <div class="stat-item-modern">
+                                <div class="stat-label-modern">Best Region</div>
+                                <div class="stat-text-modern">${winner.region}</div>
+                            </div>
+                        </div>
+
+                        <div class="match-badge-modern">
+                            <span>
+                                <strong>✓ Perfect Match:</strong> ${winner.matches.length} parameters match
+                            </span>
+                            <span class="badge-ai-modern">AI RECOMMENDED</span>
+                        </div>
+
+                        <div style="color: var(--text-secondary); font-size: 1.1rem;">
+                            🌟 Best suited for ${winner.season} season
+                        </div>
+                    </div>
+
+                    <div class="runner-section-modern">
+                        <h3 class="runner-title-modern">
+                            <span>🥈</span>
+                            <span>Also Good Options</span>
+                        </h3>
+                        <div class="runner-grid-modern">
+                            <div class="runner-card-modern">
+                                <span class="runner-icon-modern">${runnerUp.icon}</span>
+                                <div class="runner-info-modern">
+                                    <div class="runner-name-modern">${runnerUp.name}</div>
+                                    <div class="runner-marathi-modern">${runnerUp.marathi}</div>
+                                    <div class="runner-score-modern">${runnerUp.score}% match</div>
+                                </div>
+                            </div>
+                            <div class="runner-card-modern">
+                                <span class="runner-icon-modern">${thirdPlace.icon}</span>
+                                <div class="runner-info-modern">
+                                    <div class="runner-name-modern">${thirdPlace.name}</div>
+                                    <div class="runner-marathi-modern">${thirdPlace.marathi}</div>
+                                    <div class="runner-score-modern">${thirdPlace.score}% match</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                document.getElementById('recommendationResult').innerHTML = resultHTML;
+            }, 5000); // 5 second delay
+        }
+
+        // Initial update
+        updateValues();
+    </script>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

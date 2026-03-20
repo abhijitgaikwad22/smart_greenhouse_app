@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - Smart Greenhouse</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* About Page Specific Styles */
+        .about-hero {
+            text-align: center;
+            margin-bottom: var(--space-16);
+            position: relative;
+        }
+
+        .about-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+            background: var(--glass-green);
+            border: 1px solid var(--border-soft);
+            padding: var(--space-2) var(--space-5);
+            border-radius: var(--radius-full);
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--green-400);
+            margin-bottom: var(--space-4);
+        }
+
+        .project-title {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 800;
+            background: var(--gradient-neon);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: var(--space-4);
+            line-height: 1.2;
+        }
+
+        .project-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto var(--space-6);
+        }
+
+        /* Project Description Card */
+        .project-card {
+            background: var(--gradient-card);
+            border-radius: var(--radius-2xl);
+            padding: var(--space-8);
+            border: 1px solid var(--border-subtle);
+            margin-bottom: var(--space-16);
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .project-card::before {
+            content: '🌱';
+            position: absolute;
+            right: -20px;
+            bottom: -20px;
+            font-size: 150px;
+            opacity: 0.05;
+            transform: rotate(-15deg);
+        }
+
+        .project-description {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: var(--space-6);
+            max-width: 800px;
+        }
+
+        .project-meta {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-4);
+            margin-top: var(--space-6);
+        }
+
+        .meta-item {
+            background: var(--bg-raised);
+            border-radius: var(--radius-lg);
+            padding: var(--space-4);
+            text-align: center;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .meta-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--green-400);
+            line-height: 1;
+            margin-bottom: var(--space-1);
+        }
+
+        .meta-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Team Section */
+        .team-header {
+            text-align: center;
+            margin-bottom: var(--space-12);
+        }
+
+        .team-header h2 {
+            font-size: 2.5rem;
+            color: var(--text-white);
+            margin-bottom: var(--space-2);
+        }
+
+        .team-header p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-6);
+            margin-bottom: var(--space-16);
+        }
+
+        .team-card {
+            background: var(--gradient-card);
+            border-radius: var(--radius-2xl);
+            padding: var(--space-6);
+            border: 1px solid var(--border-subtle);
+            transition: var(--t-spring);
+            display: flex;
+            gap: var(--space-6);
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .team-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient-green);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+            transform-origin: left;
+        }
+
+        .team-card:hover {
+            transform: translateY(-6px);
+            border-color: var(--border-soft);
+            box-shadow: var(--glow-sm), var(--shadow-xl);
+        }
+
+        .team-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .team-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: var(--gradient-green);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: white;
+            flex-shrink: 0;
+            border: 3px solid var(--border-bright);
+            box-shadow: var(--glow-sm);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .team-avatar::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(145deg, rgba(255,255,255,0.2), transparent);
+            border-radius: 50%;
+        }
+
+        .team-info {
+            flex: 1;
+        }
+
+        .team-name {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-white);
+            margin-bottom: 0.2rem;
+            line-height: 1.2;
+        }
+
+        .team-role {
+            color: var(--green-400);
+            font-size: 1rem;
+            font-weight: 500;
+            margin-bottom: var(--space-3);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .team-prn {
+            background: var(--bg-raised);
+            padding: var(--space-2) var(--space-3);
+            border-radius: var(--radius-lg);
+            display: inline-block;
+            margin-bottom: var(--space-3);
+            border: 1px solid var(--border-subtle);
+        }
+
+        .team-prn span {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .team-prn strong {
+            color: var(--green-400);
+            margin-left: var(--space-2);
+        }
+
+        .team-social {
+            display: flex;
+            gap: var(--space-3);
+            margin-top: var(--space-3);
+        }
+
+        .social-link {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--bg-raised);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            transition: var(--t-spring);
+            border: 1px solid var(--border-subtle);
+            text-decoration: none;
+        }
+
+        .social-link:hover {
+            background: var(--gradient-green);
+            color: white;
+            transform: translateY(-3px) scale(1.1);
+            border-color: transparent;
+            box-shadow: var(--glow-sm);
+        }
+
+        .social-link.linkedin:hover {
+            background: linear-gradient(135deg, #0077b5, #00a0dc);
+        }
+
+        .social-link.github:hover {
+            background: linear-gradient(135deg, #333, #24292e);
+        }
+
+        .social-link.twitter:hover {
+            background: linear-gradient(135deg, #1DA1F2, #1a8cd8);
+        }
+
+        /* Tech Stack Section */
+        .tech-section {
+            background: var(--glass-green);
+            border-radius: var(--radius-2xl);
+            padding: var(--space-8);
+            border: 1px solid var(--border-soft);
+            margin-top: var(--space-8);
+        }
+
+        .tech-section h3 {
+            color: var(--text-white);
+            margin-bottom: var(--space-6);
+            text-align: center;
+            font-size: 1.8rem;
+        }
+
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-4);
+        }
+
+        .tech-item {
+            background: var(--bg-raised);
+            border-radius: var(--radius-xl);
+            padding: var(--space-4);
+            text-align: center;
+            border: 1px solid var(--border-subtle);
+            transition: var(--t-base);
+        }
+
+        .tech-item:hover {
+            transform: translateY(-4px);
+            border-color: var(--border-soft);
+            box-shadow: var(--glow-sm);
+        }
+
+        .tech-icon {
+            font-size: 2.5rem;
+            margin-bottom: var(--space-2);
+            color: var(--green-400);
+        }
+
+        .tech-name {
+            color: var(--text-white);
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+        }
+
+        .tech-desc {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .team-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .project-meta {
+                grid-template-columns: 1fr;
+            }
+            
+            .tech-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .team-card {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .team-social {
+                justify-content: center;
+            }
+            
+            .project-title {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .tech-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <span class="logo-icon">🌿</span>
+            <span>GreenHouse AI</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="{{ url_for('auth.index') }}">Home</a></li>
+            <li><a href="{{ url_for('about') }}">About</a></li>
+            <li><a href="{{ url_for('auth.login') }}" class="btn-primary" style="color: white;"">Login to Start Detection</a></li>
+            <!-- <li><a href="{{ url_for('detection.detect') }}" class="btn-primary" style="color: white;">Start Detection</a></li> -->
+        </ul>
+    </nav>
+
+    <div class="section">
+        <!-- About Hero -->
+        <div class="about-hero">
+            <div class="about-badge">
+                <span>🚀</span>
+                <span>ABOUT THE PROJECT</span>
+                <span>🌱</span>
+            </div>
+            <h1 class="project-title">Smart Greenhouse AI</h1>
+            <p class="project-subtitle">Intelligent Environment Monitoring & Advisory System for Modern Agriculture</p>
+        </div>
+
+        <!-- Project Description -->
+        <div class="project-card">
+            <h2 style="color: var(--text-white); margin-bottom: var(--space-4); font-size: 2rem;">🌿 Project Overview</h2>
+            <div class="project-description">
+                <p style="margin-bottom: var(--space-4);">
+                    <strong>Smart Greenhouse AI</strong> is a cutting-edge web application designed to revolutionize greenhouse farming in Maharashtra. 
+                    Our platform uses intelligent rule-based algorithms to monitor environmental parameters and provide real-time advisory to farmers.
+                </p>
+                <p style="margin-bottom: var(--space-4);">
+                    With support for <strong>20+ major crops</strong> of Maharashtra including Tomato, Grapes, Pomegranate, Cotton, Sugarcane, and more, 
+                    the system analyzes temperature, humidity, soil moisture, and light intensity to generate crop-specific recommendations.
+                </p>
+                <p>
+                    The application features AI-powered crop recommendation, fertilizer guide, weather advisory, and detailed analytics dashboard - 
+                    all designed with a modern glassmorphism UI and bilingual support (English & Marathi) for Maharashtra farmers.
+                </p>
+            </div>
+
+            <div class="project-meta">
+                <div class="meta-item">
+                    <div class="meta-value">20+</div>
+                    <div class="meta-label">Crops Supported</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-value">36</div>
+                    <div class="meta-label">Districts Covered</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-value">2024</div>
+                    <div class="meta-label">Project Year</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Team Section -->
+        <div class="team-header">
+            <h2>👥 Our Team</h2>
+            <p>Meet the developers behind Smart Greenhouse AI</p>
+        </div>
+
+        <div class="team-grid">
+            <!-- Team Member 1 -->
+            <div class="team-card">
+                <div class="team-avatar">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <div class="team-info">
+                    <h3 class="team-name">Abhijit shivram Gaikwad</h3>
+                    <div class="team-role">Project Research work</div>
+                    <div class="team-prn">
+                        <span>PRN:</span>
+                        <strong>220105131380</strong>
+                    </div>
+                    <div class="team-social">
+                        <a href="https://url-shortener.me/DW0L" class="social-link linkedin" target="_blank">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                        <a href="#" class="social-link github" target="_blank">
+                            <i class="fab fa-github"></i>
+                        </a>
+                        <a href="#" class="social-link twitter" target="_blank">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Team Member 2 -->
+            <div class="team-card">
+                <div class="team-avatar">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <div class="team-info">
+                    <h3 class="team-name">Bhargavi Rajendra Thakre</h3>
+                    <div class="team-role">Frontend Developer</div>
+                    <div class="team-prn">
+                        <span>PRN:</span>
+                        <strong>220105131382</strong>
+                    </div>
+                    <div class="team-social">
+                        <a href="https://www.linkedin.com/in/bhargavi-thakre-9494a6308" class="social-link linkedin" target="_blank">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                        <a href="#" class="social-link github" target="_blank">
+                            <i class="fab fa-github"></i>
+                        </a>
+                        <a href="#" class="social-link twitter" target="_blank">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Team Member 3 -->
+            <div class="team-card">
+                <div class="team-avatar">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <div class="team-info">
+                    <h3 class="team-name">Revati Santosh Jadhao</h3>
+                    <div class="team-role">Backend Developer</div>
+                    <div class="team-prn">
+                        <span>PRN:</span>
+                        <strong>220105131297</strong>
+                    </div>
+                    <div class="team-social">
+                        <a href="https://www.linkedin.com/in/revati-jadhav-41477b2b8/" class="social-link linkedin" target="_blank">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                        <a href="#" class="social-link github" target="_blank">
+                            <i class="fab fa-github"></i>
+                        </a>
+                        <a href="#" class="social-link twitter" target="_blank">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Team Member 4 -->
+            <div class="team-card">
+                <div class="team-avatar">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <div class="team-info">
+                    <h3 class="team-name">Vaishanavi Ajay Shewale</h3>
+                    <div class="team-role">Backend Developer</div>
+                    <div class="team-prn">
+                        <span>PRN:</span>
+                        <strong>220105131351</strong>
+                    </div>
+                    <div class="team-social">
+                        <a href="#" class="social-link linkedin" target="_blank">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                        <a href="#" class="social-link github" target="_blank">
+                            <i class="fab fa-github"></i>
+                        </a>
+                        <a href="#" class="social-link twitter" target="_blank">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tech Stack Section -->
+        <div class="tech-section">
+            <h3>⚡ Technology Stack</h3>
+            <div class="tech-grid">
+                <div class="tech-item">
+                    <div class="tech-icon">
+                        <i class="fab fa-python"></i>
+                    </div>
+                    <div class="tech-name">Python Flask</div>
+                    <div class="tech-desc">Backend Framework</div>
+                </div>
+                <div class="tech-item">
+                    <div class="tech-icon">
+                        <i class="fab fa-html5"></i>
+                    </div>
+                    <div class="tech-name">HTML5</div>
+                    <div class="tech-desc">Structure</div>
+                </div>
+                <div class="tech-item">
+                    <div class="tech-icon">
+                        <i class="fab fa-css3-alt"></i>
+                    </div>
+                    <div class="tech-name">CSS3</div>
+                    <div class="tech-desc">Glassmorphism UI</div>
+                </div>
+                <div class="tech-item">
+                    <div class="tech-icon">
+                        <i class="fab fa-js"></i>
+                    </div>
+                    <div class="tech-name">JavaScript</div>
+                    <div class="tech-desc">Interactive Features</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Note -->
+        <div style="text-align: center; margin-top: var(--space-12); color: var(--text-muted);">
+            <p>© 2024 Smart Greenhouse AI. All rights reserved.</p>
+            <p style="margin-top: var(--space-2);">Made with 🌱 for Maharashtra Farmers</p>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
